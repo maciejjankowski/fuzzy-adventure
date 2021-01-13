@@ -1,0 +1,43 @@
+query CategoryPagination(
+  $id: ID!
+  $page: Int!
+  $pageSize: Int!
+  $hasItems: Boolean!
+  $hasEntries: Boolean!
+  $facetValues: FacetValuesInput
+) {
+  category(id: $id) {
+    id
+    name
+    entries(page: $page, pageSize: $pageSize, facetValues: $facetValues)
+      @include(if: $hasEntries) {
+      pagination {
+        page
+        totalPages
+        totalResults
+        __typename
+      }
+      __typename
+    }
+    items(page: $page, pageSize: $pageSize, facetValues: $facetValues)
+      @include(if: $hasItems) {
+      pagination {
+        page
+        totalPages
+        totalResults
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+  variables: {
+    id: 'web2-4045758',
+    pageSize: 60,
+    page: 1,
+    facetValues: { multi: [], range: [], single: [] },
+    hasEntries: true,
+    hasItems: false,
+  }
