@@ -36,5 +36,5 @@ client = Client(transport=transport, fetch_schema_from_transport=True)
 query = gql(query)
 
 # Execute the query on the transport
-result = client.execute(query)
+result = client.execute(query, variable_values=variables)
 print(result)
