@@ -1,0 +1,122 @@
+query GetCategoryProducts(
+  $categoryId: ID!
+  $pageSize: Int!
+  $page: Int!
+  $facetValues: FacetValuesInput
+) {
+  category(id: $categoryId) {
+    id
+    name
+    items(page: $page, pageSize: $pageSize, facetValues: $facetValues) {
+      pagination {
+        page
+        totalPages
+        totalResults
+        __typename
+      }
+      items {
+        id
+        name
+        description
+        brand {
+          id
+          name
+          logo {
+            src
+            alt
+            __typename
+          }
+          __typename
+        }
+        classifications {
+          code
+          values {
+            key
+            value
+            __typename
+          }
+          __typename
+        }
+        image {
+          src
+          alt
+          __typename
+        }
+        groupedAssets {
+          images {
+            attributeMappings {
+              symbol
+              attributeIds
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        quantity
+        roundingQuantity
+        minimumQuantity
+
+        customAttributes {
+          ...AttributeValue
+          __typename
+        }
+        variant {
+          id
+          displayableAttributes {
+            ...AttributeValue
+            __typename
+          }
+          groupedAssets {
+            images {
+              attributeMappings {
+                symbol
+                attributeIds
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        displayableAttributes {
+          ...AttributeValue
+          __typename
+        }
+        groupedAssets {
+          images {
+            attributeMappings {
+              symbol
+              attributeIds
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment AttributeValue on AttributeValue {
+  id
+  attribute {
+    id
+    dataType
+    description
+    unit {
+      id
+      content
+      symbol
+      __typename
+    }
+    __typename
+  }
+  values
+  __typename
+}

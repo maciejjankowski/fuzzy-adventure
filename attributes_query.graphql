@@ -1,0 +1,73 @@
+{"operationName":"ItemAttributes","variables":
+{"id":"98510","componentId":"","hasComponentId":false}
+,"query":"query ItemAttributes($id: ID!, $hasComponentId: Boolean!, $componentId: ID!) {
+  item(id: $id) {
+    __typename
+    ... on Item {
+      id
+      customAttributes {
+        ...AttributeValue
+        __typename
+      }
+      variant {
+        id
+        displayableAttributes {
+          ...AttributeValue
+          __typename
+        }
+        groupedAssets {
+          images {
+            attributeMappings {
+              symbol
+              attributeIds
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      displayableAttributes {
+        ...AttributeValue
+        __typename
+      }
+      displayableComponentAttributes(componentId: $componentId) @include(if: $hasComponentId) {
+        id
+        ...AttributeValue
+        __typename
+      }
+      groupedAssets {
+        images {
+          attributeMappings {
+            symbol
+            attributeIds
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+  }
+}
+
+fragment AttributeValue on AttributeValue {
+  id
+  attribute {
+    id
+    dataType
+    description
+    unit {
+      id
+      content
+      symbol
+      __typename
+    }
+    __typename
+  }
+  values
+  __typename
+}
+"}
