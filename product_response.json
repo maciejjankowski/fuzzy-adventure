@@ -1,0 +1,398 @@
+{
+  "data": {
+    "item": {
+      "__typename": "Item",
+      "id": "U02220",
+      "name": "Przyczepa do bel z 8 belami",
+      "image": {
+        "src": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=kramps",
+        "alt": "U02220",
+        "__typename": "Image"
+      },
+      "groupedAssets": {
+        "images": [
+          {
+            "id": "U02220",
+            "description": "U02220",
+            "customSizes": [
+              {
+                "key": "tiny",
+                "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=small_thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "small",
+                "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "normal",
+                "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=kramps",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "large",
+                "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=krampd_rd",
+                "__typename": "KeyValue"
+              }
+            ],
+            "attributeMappings": [],
+            "__typename": "MediaAsset"
+          },
+          {
+            "id": "TOYS_ICON_AGE_3PLUS_TD",
+            "description": "Images/KRAMP/Symbols/TOYS_ICON_AGE_3PLUS.EPS",
+            "customSizes": [
+              {
+                "key": "tiny",
+                "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=small_thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "small",
+                "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "normal",
+                "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=kramps",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "large",
+                "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=krampd_rd",
+                "__typename": "KeyValue"
+              }
+            ],
+            "attributeMappings": [],
+            "__typename": "MediaAsset"
+          },
+          {
+            "id": "TOYS_ICON_SCALE_1_16",
+            "description": "TOYS_ICON_SCALE_1_16",
+            "customSizes": [
+              {
+                "key": "tiny",
+                "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=small_thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "small",
+                "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=thumb",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "normal",
+                "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=kramps",
+                "__typename": "KeyValue"
+              },
+              {
+                "key": "large",
+                "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=krampd_rd",
+                "__typename": "KeyValue"
+              }
+            ],
+            "attributeMappings": [],
+            "__typename": "MediaAsset"
+          }
+        ],
+        "videos": [],
+        "__typename": "GroupedAssets"
+      },
+      "displayableAttributes": [
+        {
+          "id": "taToyModelBrand#hummer",
+          "attribute": {
+            "id": "taToyModelBrand",
+            "dataType": "UNKNOWN",
+            "description": "Marka miniatury/maszyny/pojazdu",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Hummer"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taToyModelScale#1/16",
+          "attribute": {
+            "id": "taToyModelScale",
+            "dataType": "UNKNOWN",
+            "description": "Skala",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["1:16"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taAgeYears_2#value",
+          "attribute": {
+            "id": "taAgeYears_2",
+            "dataType": "UNKNOWN",
+            "description": "Kategoria wiekowa - wiek od",
+            "unit": {
+              "id": "unece.unit.ANN",
+              "content": "rok",
+              "symbol": "rok",
+              "__typename": "UnitOfMeasurement"
+            },
+            "__typename": "Attribute"
+          },
+          "values": ["3"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taToyModelType#baler",
+          "attribute": {
+            "id": "taToyModelType",
+            "dataType": "UNKNOWN",
+            "description": "Typ miniatury maszyny/pojazdu",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Prasa"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taIndustryApplication_3#agriculture",
+          "attribute": {
+            "id": "taIndustryApplication_3",
+            "dataType": "UNKNOWN",
+            "description": "Realne zastosowanie maszyny/pojazdu",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Rolnictwo"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taPlayable#yes",
+          "attribute": {
+            "id": "taPlayable",
+            "dataType": "UNKNOWN",
+            "description": "Do zabawy",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Tak"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taBatteryIncluded#no",
+          "attribute": {
+            "id": "taBatteryIncluded",
+            "dataType": "UNKNOWN",
+            "description": "Baterie w komplecie",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Nie"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taWidthMm_39#value",
+          "attribute": {
+            "id": "taWidthMm_39",
+            "dataType": "UNKNOWN",
+            "description": "Szerokość bez opakowania",
+            "unit": {
+              "id": "unece.unit.MMT",
+              "content": "minimetr",
+              "symbol": "mm",
+              "__typename": "UnitOfMeasurement"
+            },
+            "__typename": "Attribute"
+          },
+          "values": ["155"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taLengthMm_33#value",
+          "attribute": {
+            "id": "taLengthMm_33",
+            "dataType": "UNKNOWN",
+            "description": "Długość bez opakowania",
+            "unit": {
+              "id": "unece.unit.MMT",
+              "content": "minimetr",
+              "symbol": "mm",
+              "__typename": "UnitOfMeasurement"
+            },
+            "__typename": "Attribute"
+          },
+          "values": ["440"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taHeightMm_14#value",
+          "attribute": {
+            "id": "taHeightMm_14",
+            "dataType": "UNKNOWN",
+            "description": "Wysokość bez opakowania",
+            "unit": {
+              "id": "unece.unit.MMT",
+              "content": "minimetr",
+              "symbol": "mm",
+              "__typename": "UnitOfMeasurement"
+            },
+            "__typename": "Attribute"
+          },
+          "values": ["155"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taAmountPerPackageQuantity#value",
+          "attribute": {
+            "id": "taAmountPerPackageQuantity",
+            "dataType": "UNKNOWN",
+            "description": "Ilość w opakowaniu",
+            "unit": {
+              "id": "unece.unit.KrPcs",
+              "content": "sztuk",
+              "symbol": "szt.",
+              "__typename": "UnitOfMeasurement"
+            },
+            "__typename": "Attribute"
+          },
+          "values": ["1"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "taMaterial_6#Metal",
+          "attribute": {
+            "id": "taMaterial_6",
+            "dataType": "UNKNOWN",
+            "description": "Materiał",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": ["Metal", "Tworzywo sztuczne"],
+          "__typename": "AttributeValue"
+        },
+        {
+          "id": "U02220#taAgeCategory#value",
+          "attribute": {
+            "id": "taAgeCategory",
+            "dataType": "UNKNOWN",
+            "description": "Wiek",
+            "unit": null,
+            "__typename": "Attribute"
+          },
+          "values": [],
+          "__typename": "AttributeValue"
+        }
+      ],
+      "variant": {
+        "id": "ticItemGroup-47653957",
+        "displayableAttributes": [
+          {
+            "id": "ticItemGroup-47653957#attProperties#value",
+            "attribute": {
+              "id": "attProperties",
+              "dataType": "TEXT",
+              "description": "Właściwości",
+              "unit": null,
+              "__typename": "Attribute"
+            },
+            "values": ["- Wykonany z tworzywa sztucznego"],
+            "__typename": "AttributeValue"
+          }
+        ],
+        "groupedAssets": {
+          "images": [
+            {
+              "id": "U02220",
+              "description": "U02220",
+              "usage": "asrPrimaryImage",
+              "customSizes": [
+                {
+                  "key": "normal",
+                  "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=kramps",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "large",
+                  "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=krampd_rd",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "tiny",
+                  "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=small_thumb",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "small",
+                  "value": "https://images.kramp.com/images/19/3f/u02220.jpg?profile=thumb",
+                  "__typename": "KeyValue"
+                }
+              ],
+              "attributeMappings": [],
+              "__typename": "MediaAsset"
+            },
+            {
+              "id": "TOYS_ICON_AGE_3PLUS_TD",
+              "description": "Images/KRAMP/Symbols/TOYS_ICON_AGE_3PLUS.EPS",
+              "usage": "asrTechnicalDrawing",
+              "customSizes": [
+                {
+                  "key": "normal",
+                  "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=kramps",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "large",
+                  "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=krampd_rd",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "tiny",
+                  "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=small_thumb",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "small",
+                  "value": "https://images.kramp.com/images/ad/47/toys_icon_age_3plus_td.jpg?profile=thumb",
+                  "__typename": "KeyValue"
+                }
+              ],
+              "attributeMappings": [],
+              "__typename": "MediaAsset"
+            },
+            {
+              "id": "TOYS_ICON_SCALE_1_16",
+              "description": "TOYS_ICON_SCALE_1_16",
+              "usage": "asrPictogram",
+              "customSizes": [
+                {
+                  "key": "large",
+                  "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=krampd_rd",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "tiny",
+                  "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=small_thumb",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "small",
+                  "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=thumb",
+                  "__typename": "KeyValue"
+                },
+                {
+                  "key": "normal",
+                  "value": "https://images.kramp.com/images/0b/21/toys_icon_scale_1_16.jpg?profile=kramps",
+                  "__typename": "KeyValue"
+                }
+              ],
+              "attributeMappings": [],
+              "__typename": "MediaAsset"
+            }
+          ],
+          "__typename": "GroupedAssets"
+        },
+        "__typename": "Variant"
+      },
+      "__typename": "Item"
+    }
+  }
+}
