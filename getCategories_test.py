@@ -81,9 +81,6 @@ def process_category(cat: dict, parent=0):
             process_category(child_category, created_category)  # created_category == parent_id
 
 
-pass
-
-
 def create_category(old_id, name, parent_id):
     # TODO @Kennedy -
 
@@ -125,3 +122,18 @@ query = """query GetCategoryProducts($categoryId: ID!, $isAuthenticated: Boolean
 '''
 
 # query CategoryPagination($id: ID!, $page: Int!, $pageSize: Int!, $hasItems: Boolean!, $hasEntries: Boolean!, $facetValues: FacetValuesInput) {  category(id: $id) {    id    name    entries(page: $page, pageSize: $pageSize, facetValues: $facetValues) @include(if: $hasEntries) {      pagination {        page        totalPages        totalResults        __typename}      __typename}    items(page: $page, pageSize: $pageSize, facetValues: $facetValues) @include(if: $hasItems) {      pagination {        page        totalPages        totalResults        __typename}      __typename}    __typename}}
+
+
+def process_product(downloaded_product):
+    product = prepare_product_data(downloaded_product)
+    try:
+        create_or_update(product)
+    except:
+        log_error("product failed", product)
+
+
+def create_or_update_product():
+    if find_product_by_id("Kcostam1"):
+        update_product_by_id(...)
+    else:
+        create_product(...)
