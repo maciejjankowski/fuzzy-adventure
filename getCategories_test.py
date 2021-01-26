@@ -4,8 +4,10 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import json
 from shoper_dicts import get_end_category
 from shoper_auth import login_to_session
+from csv_operation import append_dict_as_row
 
 false = False
+urs_err = 0
 
 transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
                              headers={"ctx-locale": "pl_PL"})
@@ -83,27 +85,43 @@ def process_category(cat: dict, parent=0):
 
 def create_category(old_id, name, parent_id):
     # TODO @Kennedy -
+    global urs_err
 
     session = login_to_session(
         shop_url=shop_url,
         client_id=client_id,
         client_secret=client_secret
     )
-    new_id = old_id + "_k"
-    end_cat = get_end_category(parent_id=parent_id, name=name, new_id=new_id)
+    if type(parent_id) is not int:
+        parent_id = 0
+
+    end_cat = get_end_category(parent_id=parent_id, name=name, old_shop_id=old_id)
     response = session.post(
         url=shop_url + '/webapi/rest/categories',
         data=json.dumps(end_cat)
     )
 
-    print(response.status_code, response.text, type(response.text))
-
     if response.status_code == 200:
         print("creating category:", old_id, name, parent_id, "\n")
-    else:
-        print("failed", "\n")
+    if response.status_code == 400:
+        end_cat['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
+        response = session.post(
+            url=shop_url + '/webapi/rest/categories',
+            data=json.dumps(end_cat)
+        )
+        urs_err += 1
+        print(response.text)
 
-    return response.text  # zwraca new_category_id, żeby podłączać podrzędne kategorie
+    new_id = response.text
+
+    new_old_id_dict = {"old_id": old_id, "new_id": new_id}
+
+    append_dict_as_row(file_name="odl_new_category_id.csv",
+                       dict_of_elem=new_old_id_dict,
+                       field_names=["old_id", "new_id"]
+                       )
+
+    return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
 
 try:
