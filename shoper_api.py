@@ -18,7 +18,8 @@ import requests
 from time import sleep
 import json
 
-MAX_RETRIES = 5  # max
+MAX_RETRIES = 5
+urs_err = 0
 
 
 def login_to_session():
@@ -113,28 +114,28 @@ def request(data, url, session, ):
     return new_id
 
 
-def create_category_api(data):
+def create_category_api(data, session):
     """
 
-    :param data:  should have parent_id, old_shop_id, name
+    :param data: dict - should have parent_id, old_shop_id, name
+    :param session: shoper api session
     :return: category ID in shoper database (need if its parent/main category)
+    :raises GenericApiException:
     """
     url = shop_url + '/webapi/rest/categories'
     try:
-        new_id = request(data, url)
+        new_id = request(data, url, session=session)
         return new_id
     except GenericApiException:
         print("creating category failed")
         raise AddingRecordFailedException
 
 
-urs_err = 0
-
-
 def create_product_api(data, session):  # todo
     """
-    :param data:
-    :return: new_id: str
+    :param session: shoper api session
+    :param data: dict
+    :return: new_id: ID of the new product in the shoper database
     :raises GenericApiException:
     """
     global urs_err
