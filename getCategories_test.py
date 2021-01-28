@@ -2,7 +2,7 @@ from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
 import json
-from get_session import get_shoper_session
+from shoper_api import get_shoper_session, create_product_api, create_category_api, GenericApiException
 from shoper_dicts import get_end_category, get_end_product
 from csv_operation import append_dict_as_row
 from local_settings import shop_url
@@ -15,6 +15,7 @@ transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
 
 client = Client(transport=transport, fetch_schema_from_transport=True)
 
+session = get_shoper_session()
 
 def get_category_by_id(cat_id: str):
     query_text = """query GetChildCategories($id: ID!) {\n  category(id: $id) {\n    id\n    name\n    childCategories {\n      id\n      name\n      image {\n        src\n        alt\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n """
@@ -84,7 +85,7 @@ def process_category(cat: dict, parent=0):
             process_category(child_category, created_category)  # created_category == parent_id
 
 
-def create_category(old_id, name, parent_id, session):
+def create_category(old_id, name, parent_id):
     # TODO @Kennedy -
     global urs_err
 
@@ -92,23 +93,7 @@ def create_category(old_id, name, parent_id, session):
         parent_id = 0
 
     end_cat = get_end_category(parent_id=parent_id, name=name, old_shop_id=old_id)
-    response = session.post(
-        url=shop_url + '/webapi/rest/categories',
-        data=json.dumps(end_cat)
-    )
 
-    if response.status_code == 200:
-        print("creating category:", old_id, name, parent_id, "\n")
-    if response.status_code == 400:
-        end_cat['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
-        response = session.post(
-            url=shop_url + '/webapi/rest/categories',
-            data=json.dumps(end_cat)
-        )
-        urs_err += 1
-        print(response.text)
-
-    new_id = response.text
 
     new_old_id_dict = {"old_id": old_id, "new_id": new_id}
 
@@ -120,28 +105,27 @@ def create_category(old_id, name, parent_id, session):
     return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
 
-def create_product(data, parent_id, session):
+MAX_RETRIES = 6
+
+
+def create_product(data, parent_id):
     global urs_err
-
-    if type(parent_id) is not int:
-        parent_id = 0
-
     end_product = get_end_product(data)
-    response = session.post(
-        url=shop_url + '/webapi/rest/product',
-        data=json.dumps(end_product)
-    )
+    retry_request = MAX_RETRIES
+    while retry_request >= 0:
+        try:
+            new_id = create_product_api(end_product)
+            return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
+        except GenericApiException:
+            print(response.text)
+            data['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
+            urs_err += 1
+            print("creating product:", "\n")
+            retry_request -= 1
 
-    if response.status_code == 200:
-        print("creating product:", "\n")
 
-    if response.status_code == 400:
-        urs_err += 1
-        print(response.text)
 
-    new_id = response.text
 
-    return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
 
 if __name__ == '__main__':
