@@ -2,9 +2,10 @@ from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
 import json
-from shoper_dicts import get_end_category
-from shoper_auth import login_to_session
+from get_session import get_shoper_session
+from shoper_dicts import get_end_category, get_end_product
 from csv_operation import append_dict_as_row
+from local_settings import shop_url
 
 false = False
 urs_err = 0
@@ -83,15 +84,10 @@ def process_category(cat: dict, parent=0):
             process_category(child_category, created_category)  # created_category == parent_id
 
 
-def create_category(old_id, name, parent_id):
+def create_category(old_id, name, parent_id, session):
     # TODO @Kennedy -
     global urs_err
 
-    session = login_to_session(
-        shop_url=shop_url,
-        client_id=client_id,
-        client_secret=client_secret
-    )
     if type(parent_id) is not int:
         parent_id = 0
 
@@ -124,10 +120,29 @@ def create_category(old_id, name, parent_id):
     return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
 
-try:
-    from local_settings import *
-except ImportError:
-    print("Please create local file 'local_settings.py'\n")
+def create_product(data, parent_id, session):
+    global urs_err
+
+    if type(parent_id) is not int:
+        parent_id = 0
+
+    end_product = get_end_product(data)
+    response = session.post(
+        url=shop_url + '/webapi/rest/product',
+        data=json.dumps(end_product)
+    )
+
+    if response.status_code == 200:
+        print("creating product:", "\n")
+
+    if response.status_code == 400:
+        urs_err += 1
+        print(response.text)
+
+    new_id = response.text
+
+    return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
+
 
 if __name__ == '__main__':
     start_scraping()
