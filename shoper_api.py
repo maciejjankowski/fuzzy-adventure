@@ -44,10 +44,6 @@ def get_shoper_session():
     return session
 
 
-class ApiException(Exception):
-    pass
-
-
 class LoginException(Exception):
     pass
 
