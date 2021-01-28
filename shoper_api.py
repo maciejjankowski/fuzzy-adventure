@@ -18,8 +18,13 @@ import requests
 from time import sleep
 import json
 
+MAX_RETRIES = 5  # max
 
-def login_to_session(shop_url, client_id, client_secret):
+
+def login_to_session():
+    """
+    :return: session to shoper api
+    """
     session = requests.Session()
     my_obj = {
         'client_id': client_id,
@@ -30,16 +35,6 @@ def login_to_session(shop_url, client_id, client_secret):
 
     token = result['access_token']
     session.headers.update({'Authorization': 'Bearer %s' % token})
-
-    return session
-
-
-def get_shoper_session():
-    session = login_to_session(
-            shop_url=shop_url,
-            client_id=client_id,
-            client_secret=client_secret
-        )
 
     return session
 
@@ -57,6 +52,7 @@ class ThrottlingException(Exception):
 
 
 class GenericApiException(Exception):
+
     def __init__(self, status_code, body="API Error"):
         self.status_code = status_code
         self.body = body
@@ -66,17 +62,24 @@ class GenericApiException(Exception):
         return f'{self.status_code} -> {self.body}'
 
 
-MAX_RETRIES = 5
+class AddingRecordFailedException(Exception):
+    pass
 
 
-def request(data, url):
+def request(data, url, session, ):
+    """
+    :param session: shoper api session
+    :param data: wat we want send to endpoint
+    :param url: url for endpoint is shoper api
+    :return:  new_id - ID of the new item in the shoper database
+    """
     retry_request = MAX_RETRIES
     response = None
     while retry_request >= 0:
         try:
             response = session.post(
                 url,
-                data=json.dumps(end_cat)
+                data=json.dumps(data)
             )
             if response.status_code == 401:
                 raise LoginException
@@ -87,7 +90,7 @@ def request(data, url):
                 if response_json["error"] == 'temporarily_unavailable':
                     raise ThrottlingException
 
-            except:
+            except ValueError:  # todo:
                 print("nope")
 
             return response.text
@@ -98,7 +101,7 @@ def request(data, url):
             raise GenericApiException(response.status_code, response.text)
 
         except LoginException:
-            get_shoper_session()
+            login_to_session()
             print("login expired, logging again")
             retry_request -= 1
 
@@ -107,10 +110,15 @@ def request(data, url):
             retry_request -= 1
 
     new_id = response.text
-
+    return new_id
 
 
 def create_category_api(data):
+    """
+
+    :param data:  should have parent_id, old_shop_id, name
+    :return: category ID in shoper database (need if its parent/main category)
+    """
     url = shop_url + '/webapi/rest/categories'
     try:
         new_id = request(data, url)
@@ -123,7 +131,7 @@ def create_category_api(data):
 urs_err = 0
 
 
-def create_product_api(data):
+def create_product_api(data, session):  # todo
     """
     :param data:
     :return: new_id: str
@@ -132,17 +140,15 @@ def create_product_api(data):
     global urs_err
     url = ""
     urs_err = 0
-    if type(parent_id) is not int:
-        parent_id = 0
+    if type(data['parent_id']) is not int:
+        data['parent_id'] = 0
 
     try:
-        new_id = request(data, url)
-        print("creating product:", old_id, name, parent_id, "\n")
+        new_id = request(data, url, session=session)
+        print("creating product:", data["name"], "\n")
         return new_id
     except GenericApiException():
         print("creating product failed")
-
-
 
 
 try:
