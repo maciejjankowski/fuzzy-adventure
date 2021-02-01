@@ -18,6 +18,12 @@ import requests
 from time import sleep
 import json
 
+try:
+    from local_settings import *
+except ImportError:
+    print("Please create local file 'local_settings.py'\n")
+
+
 MAX_RETRIES = 5
 urs_err = 0
 
@@ -54,7 +60,7 @@ class ThrottlingException(Exception):
 
 class GenericApiException(Exception):
 
-    def __init__(self, status_code, body="API Error"):
+    def __init__(self, status_code=-1, body="API Error"):
         self.status_code = status_code
         self.body = body
         super().__init__(self.body)
@@ -67,7 +73,7 @@ class AddingRecordFailedException(Exception):
     pass
 
 
-def request(data, url, session, ):
+def request(data, url, session, method='POST' ):
     """
     :param session: shoper api session
     :param data: wat we want send to endpoint
@@ -78,10 +84,79 @@ def request(data, url, session, ):
     response = None
     while retry_request >= 0:
         try:
-            response = session.post(
+            if method == "POST":
+                response = session.post(
+                    url,
+                    data=json.dumps(data)
+                )
+            elif method == "GET":
+                response = session.get(
+                    url,
+                    params=data
+                )
+            else:
+                raise GenericApiException
+
+            if response.status_code == 401:
+                raise LoginException
+            if response.status_code == 400:
+                raise GenericApiException(response.status_code, response.text)
+            if response.status_code == 429:
+                # if response_json.get("error") == 'temporarily_unavailable':
+                raise ThrottlingException
+
+
+
+            if response.status_code == 200:
+                try:
+                    if response.text[0] == '[' or response.text[0] == '{':
+                        response_json = json.loads(response.text)
+                        if response_json.get("error") == 'temporarily_unavailable':
+                            print("to nie powinno działać")
+                            raise ThrottlingException
+                        return response_json
+                    else:
+                        return response.text
+
+                except ValueError:  # todo:
+                    print("nope")
+
+            return response_json
+
+        except GenericApiException:
+            print("Generic API Error", response.status_code, response.text)
+            print("\nurl", url, "data:", data)
+            raise GenericApiException(response.status_code, response.text)
+
+        except LoginException:
+            login_to_session()
+            print("login expired, logging again")
+            retry_request -= 1
+
+        except ThrottlingException:
+            sleep(1 * (MAX_RETRIES - retry_request + 1))
+            retry_request -= 1
+
+    new_id = response.text
+    return new_id
+
+
+
+    """
+    :param session: shoper api session
+    :param data: wat we want send to endpoint
+    :param url: url for endpoint is shoper api
+    :return:  new_id - ID of the new item in the shoper database
+    """
+    retry_request = MAX_RETRIES
+    response = None
+    while retry_request >= 0:
+        try:
+            response = session.get(
                 url,
-                data=json.dumps(data)
+                params=json.dumps(data)
             )
+
             if response.status_code == 401:
                 raise LoginException
             if response.status_code == 400:
@@ -162,7 +237,7 @@ def find_product_api(data, session):  # todo
     url = shop_url + '/webapi/rest/products'
 
     try:
-        products = request(data, url, session=session)
+        products = request(data, url, session=session, method="GET")
         # print("finding product:", data["name"], "\n")
         return products
     except GenericApiException as exception:
@@ -172,7 +247,4 @@ def find_product_api(data, session):  # todo
 
 
 
-try:
-    from local_settings import *
-except ImportError:
-    print("Please create local file 'local_settings.py'\n")
+

@@ -36,11 +36,11 @@ filters 	string 	    JSON-ified string with filtering criteria
     retry_request = MAX_RETRIES
     try:
         filter_obj = {
-            "translations.pl_PL.name": name
+            "translations.pl_PL.name": name,
         }
         data = {
             "limit" : 5,
-            # "order" : "name",
+            "order" : "category.category_id",
             "page" : 1,
             "filters": 
             json.dumps(filter_obj) 
