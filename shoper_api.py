@@ -98,7 +98,7 @@ def request(data, url, session, ):
 
         except GenericApiException:
             print("Generic API Error", response.status_code, response.text)
-            print("url", url, "data:", data)
+            print("\nurl", url, "data:", data)
             raise GenericApiException(response.status_code, response.text)
 
         except LoginException:
@@ -139,7 +139,7 @@ def create_product_api(data, session):  # todo
     :raises GenericApiException:
     """
     global urs_err
-    url = ""
+    url = shop_url + '/webapi/rest/products'
     urs_err = 0
     if type(data['parent_id']) is not int:
         data['parent_id'] = 0
@@ -150,6 +150,26 @@ def create_product_api(data, session):  # todo
         return new_id
     except GenericApiException():
         print("creating product failed")
+
+
+def find_product_api(data, session):  # todo
+    """
+    :param session: shoper api session
+    :param data: dict
+    :return: new_id: ID of the new product in the shoper database
+    :raises GenericApiException:
+    """
+    url = shop_url + '/webapi/rest/products'
+
+    try:
+        products = request(data, url, session=session)
+        # print("finding product:", data["name"], "\n")
+        return products
+    except GenericApiException as exception:
+        print("finding products failed", exception)
+        raise exception
+
+
 
 
 try:

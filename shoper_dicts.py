@@ -19,7 +19,7 @@ def remove_accents(input_text):
     return input_text.translate(translator)
 
 
-def get_end_category(parent_id, old_shop_id, name):
+def create_category_data(parent_id, old_shop_id, name):
     no_accents_name = remove_accents(name)
     category = {
         'parent_id': parent_id,  # int
@@ -40,7 +40,7 @@ def get_end_category(parent_id, old_shop_id, name):
     return category
 
 
-def get_end_product(data,):
+def create_product_data(data,):
     product = {
         'product_id': int,
         'type': int,
