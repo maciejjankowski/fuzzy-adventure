@@ -21,6 +21,9 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+venv/
+__pycache__
+.vscode
 
 # nyc test coverage
 .nyc_output
@@ -102,3 +105,5 @@ dist
 
 # TernJS port file
 .tern-port
+local_settings.py
+
