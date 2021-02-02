@@ -8,10 +8,11 @@ transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
 
 client = Client(transport=transport, fetch_schema_from_transport=True)
 
+
 def get_category_by_id(cat_id:str):
     query_text = """query GetChildCategories($id: ID!) {\n  category(id: $id) {\n    id\n    name\n    childCategories {\n      id\n      name\n      image {\n        src\n        alt\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n """
     query = gql(query_text)
-    vars = {
+    params = {
         "categoryId": cat_id,
         "isAuthenticated": false,
         "pageSize": 60,
@@ -23,10 +24,9 @@ def get_category_by_id(cat_id:str):
         }
     }
 
-    result = client.execute(query, variable_values=var)  #, variable_values=variables
+    result = client.execute(query, variable_values=params)  #, variable_values=variables
     print("graphql return type: ", type(result))
     return result
-
 
 
 class Kolejka:
@@ -36,16 +36,18 @@ class Kolejka:
 
 
 def start_scraping():
-    add_categories_to_queue()
+    category_remaining_count = add_categories_to_queue()
     product_remaining_count = get_products_count()
+    # czy są kategorie do pobrania
+    while category_remaining_count > 0:
+        categoty_list = fetch_categories()
+        add_categories_to_upload_queue(categoty_list)
+
 
     while product_remaining_count > 0:
         products_list = fetch_products()
         add_products_to_upload_queue(products_list)
 
-    while category_remaining_count > 0:
-        categoty_list = fetch_categories()
-        add_categories_to_upload_queue(categoty_list)
 
 def add_categories_to_queue():
     cats = [{

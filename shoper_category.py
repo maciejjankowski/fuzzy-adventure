@@ -2,6 +2,7 @@ from shoper_api import create_category_api, GenericApiException
 from shoper_dicts import create_category_data
 from csv_operation import append_dict_as_row
 
+
 MAX_RETRIES = 6
 
 
