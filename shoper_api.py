@@ -18,8 +18,20 @@ import requests
 from time import sleep
 import json
 
+try:
+    from local_settings import *
+except ImportError:
+    print("Please create local file 'local_settings.py'\n")
 
-def login_to_session(shop_url, client_id, client_secret):
+
+MAX_RETRIES = 5
+urs_err = 0
+
+
+def login_to_session():
+    """
+    :return: session to shoper api
+    """
     session = requests.Session()
     my_obj = {
         'client_id': client_id,
@@ -34,14 +46,9 @@ def login_to_session(shop_url, client_id, client_secret):
     return session
 
 
-def get_shoper_session():
-    session = login_to_session(
-            shop_url=shop_url,
-            client_id=client_id,
-            client_secret=client_secret
-        )
 
-    return session
+class ApiException(Exception):
+    pass
 
 
 class LoginException(Exception):
@@ -53,7 +60,8 @@ class ThrottlingException(Exception):
 
 
 class GenericApiException(Exception):
-    def __init__(self, status_code, body="API Error"):
+
+    def __init__(self, status_code=-1, body="API Error"):
         self.status_code = status_code
         self.body = body
         super().__init__(self.body)
@@ -62,18 +70,94 @@ class GenericApiException(Exception):
         return f'{self.status_code} -> {self.body}'
 
 
-MAX_RETRIES = 5
+class AddingRecordFailedException(Exception):
+    pass
 
 
-def request(data, url):
+def request(data, url, session, method='POST' ):
+    """
+    :param session: shoper api session
+    :param data: wat we want send to endpoint
+    :param url: url for endpoint is shoper api
+    :return:  new_id - ID of the new item in the shoper database
+    """
     retry_request = MAX_RETRIES
     response = None
     while retry_request >= 0:
         try:
-            response = session.post(
+            if method == "POST":
+                response = session.post(
+                    url,
+                    data=json.dumps(data)
+                )
+            elif method == "GET":
+                response = session.get(
+                    url,
+                    params=data
+                )
+            else:
+                raise GenericApiException
+
+            if response.status_code == 401:
+                raise LoginException
+            if response.status_code == 400:
+                raise GenericApiException(response.status_code, response.text)
+            if response.status_code == 429:
+                # if response_json.get("error") == 'temporarily_unavailable':
+                raise ThrottlingException
+
+
+
+            if response.status_code == 200:
+                try:
+                    if response.text[0] == '[' or response.text[0] == '{':
+                        response_json = json.loads(response.text)
+                        if response_json.get("error") == 'temporarily_unavailable':
+                            print("to nie powinno działać")
+                            raise ThrottlingException
+                        return response_json
+                    else:
+                        return response.text
+
+                except ValueError:  # todo:
+                    print("nope")
+
+            return response_json
+
+        except GenericApiException:
+            print("Generic API Error", response.status_code, response.text)
+            print("\nurl", url, "data:", data)
+            raise GenericApiException(response.status_code, response.text)
+
+        except LoginException:
+            login_to_session()
+            print("login expired, logging again")
+            retry_request -= 1
+
+        except ThrottlingException:
+            sleep(1 * (MAX_RETRIES - retry_request + 1))
+            retry_request -= 1
+
+    new_id = response.text
+    return new_id
+
+
+
+    """
+    :param session: shoper api session
+    :param data: wat we want send to endpoint
+    :param url: url for endpoint is shoper api
+    :return:  new_id - ID of the new item in the shoper database
+    """
+    retry_request = MAX_RETRIES
+    response = None
+    while retry_request >= 0:
+        try:
+            response = session.get(
                 url,
-                data=json.dumps(end_cat)
+                params=json.dumps(data)
             )
+
             if response.status_code == 401:
                 raise LoginException
             if response.status_code == 400:
@@ -83,18 +167,18 @@ def request(data, url):
                 if response_json["error"] == 'temporarily_unavailable':
                     raise ThrottlingException
 
-            except:
+            except ValueError:  # todo:
                 print("nope")
 
             return response.text
 
         except GenericApiException:
             print("Generic API Error", response.status_code, response.text)
-            print("url", url, "data:", data)
+            print("\nurl", url, "data:", data)
             raise GenericApiException(response.status_code, response.text)
 
         except LoginException:
-            get_shoper_session()
+            login_to_session()
             print("login expired, logging again")
             retry_request -= 1
 
@@ -103,45 +187,65 @@ def request(data, url):
             retry_request -= 1
 
     new_id = response.text
+    return new_id
 
 
+def create_category_api(data, session):
+    """
 
-def create_category_api(data):
+    :param data: dict - should have parent_id, old_shop_id, name
+    :param session: shoper api session
+    :return: category ID in shoper database (need if its parent/main category)
+    :raises GenericApiException:
+    """
     url = shop_url + '/webapi/rest/categories'
     try:
-        new_id = request(data, url)
+        new_id = request(data, url, session=session)
         return new_id
     except GenericApiException:
         print("creating category failed")
         raise AddingRecordFailedException
 
 
-urs_err = 0
-
-
-def create_product_api(data):
+def create_product_api(data, session):  # todo
     """
-    :param data:
-    :return: new_id: str
+    :param session: shoper api session
+    :param data: dict
+    :return: new_id: ID of the new product in the shoper database
     :raises GenericApiException:
     """
     global urs_err
-    url = ""
+    url = shop_url + '/webapi/rest/products'
     urs_err = 0
-    if type(parent_id) is not int:
-        parent_id = 0
+    if type(data['parent_id']) is not int:
+        data['parent_id'] = 0
 
     try:
-        new_id = request(data, url)
-        print("creating product:", old_id, name, parent_id, "\n")
+        new_id = request(data, url, session=session)
+        print("creating product:", data["name"], "\n")
         return new_id
     except GenericApiException():
         print("creating product failed")
 
 
+def find_product_api(data, session):  # todo
+    """
+    :param session: shoper api session
+    :param data: dict
+    :return: new_id: ID of the new product in the shoper database
+    :raises GenericApiException:
+    """
+    url = shop_url + '/webapi/rest/products'
+
+    try:
+        products = request(data, url, session=session, method="GET")
+        # print("finding product:", data["name"], "\n")
+        return products
+    except GenericApiException as exception:
+        print("finding products failed", exception)
+        raise exception
 
 
-try:
-    from local_settings import *
-except ImportError:
-    print("Please create local file 'local_settings.py'\n")
+
+
+
