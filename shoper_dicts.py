@@ -1,3 +1,4 @@
+from csv_operation import read_csv_to_dict
 
 
 def remove_accents(input_text):
@@ -40,14 +41,30 @@ def create_category_data(parent_id, old_shop_id, name):
     return category
 
 
-def create_product_data(data,):
+kramp_categories = read_csv_to_dict()
+
+
+def translate_category_id(cat_id):
+    shoper_category = kramp_categories[cat_id]
+    return shoper_category
+
+
+def create_product_data(data):
+    """
+
+    :param data: from parsed json from graphql
+    :return: product data for shoper
+    """
+    print(data)
+    shoper_category = translate_category_id(data["category_id"])
+
     product = {
-        'product_id': int,
+        # 'product_id': int,
         'type': int,
         'producer_id': 'null | integer',
         'group_id': int,
         'tax_id': int,
-        'category_id': 'integer',
+        'category_id': shoper_category,
         'unit_id': 'integer',
         'add_date': 'string',
         'edit_date': 'string',
@@ -110,17 +127,17 @@ def create_product_data(data,):
             'calculation_unit_ratio': float
         },
         'translations': {
-            '(locale)': {
-                'translation_id': integer,
-                'product_id': integer,
-                'name': string,
-                'short_description': string,
-                'description': string,
-                'active': boolean,
+            'pl_pl': {
+                'translation_id': 0,
+                # 'product_id': integer, potrzebne czy samo nada?
+                'name': data['name'],
+                'short_description': data['description'],
+                'description': data['description'],
+                'active': True,
                 'isdefault': boolean,
                 'lang_id': integer,
                 'seo_title': string,
-                'seo_description': string,
+                'seo_description': data['description'],
                 'seo_keywords': string,
                 'seo_url': string | null,
                 'permalink': string,

@@ -11,6 +11,15 @@ def append_dict_as_row(file_name, dict_of_elem, field_names):
         dict_writer.writerow(dict_of_elem)
 
 
-def read_csv_to_dict(file_name):
-    with open(file_name, 'r', newline='') as data:
-        return
+def read_csv_to_dict(file_name='category_map.csv'):
+    """
+
+    :param file_name: file name.csv
+    :return: {'old_id': 'id in shoper', }
+    """
+    with open(file_name, 'r') as csv_file:
+        old_now_id_dict = {}
+        read_csv = csv.reader(csv_file, delimiter=',')
+        for row in read_csv:
+            old_now_id_dict[row[0]] = row[1]
+        return old_now_id_dict

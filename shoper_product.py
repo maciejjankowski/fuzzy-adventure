@@ -2,13 +2,15 @@ from shoper_api import create_product_api, find_product_api, GenericApiException
 from shoper_dicts import create_product_data
 import json
 
-
+urs_err = 0
 MAX_RETRIES = 6
 
 
-def create_product(data, parent_id, session=None):
+def create_product(data, session=None):
     global urs_err
+
     end_product = create_product_data(data)
+
     retry_request = MAX_RETRIES
     while retry_request >= 0:
         try:
@@ -22,26 +24,25 @@ def create_product(data, parent_id, session=None):
             retry_request -= 1
 
 
-def find_product(name, session=None):
+def find_shoper_product(name, session=None):
     """
-limit   	integer 	count of fetched objects, default: 10, max: 50
-order 	    string 	    collection sort field
-page 	    integer 	index of requested page, default: 1
-offset 	    integer 	starting record index (used instead of page)
-filters 	string 	    JSON-ified string with filtering criteria
+    limit   	integer 	count of fetched objects, default: 10, max: 50
+    order 	    string 	    collection sort field
+    page 	    integer 	index of requested page, default: 1
+    offset 	    integer 	starting record index (used instead of page)
+    filters 	string 	    JSON-ified string with filtering criteria
     """
     if session is None:
-        raise "session not created"
+        raise GenericApiException("session not created")
 
-    retry_request = MAX_RETRIES
     try:
         filter_obj = {
             "translations.pl_PL.name": name,
         }
         data = {
-            "limit" : 5,
-            "order" : "category.category_id",
-            "page" : 1,
+            "limit": 5,
+            "order": "category.category_id",
+            "page": 1,
             "filters": 
             json.dumps(filter_obj) 
         }
