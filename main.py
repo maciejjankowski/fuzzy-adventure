@@ -2,25 +2,18 @@ from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
 import json
+
+from kramp_category import get_category_by_id
 from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException
 from shoper_dicts import create_category_data, create_product_data
 from csv_operation import append_dict_as_row
 from local_settings import shop_url
 from shoper_category import create_category
-from shoper_product import create_product, find_product
+from shoper_product import create_product, find_shoper_product
 
+from kramp_products import get_graphql_products
 
-false = False
 urs_err = 0
-
-transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
-                             headers={"ctx-locale": "pl_PL"})
-
-client = Client(transport=transport, fetch_schema_from_transport=True)
-
-
-
-
 
 
 def add_categories_to_queue():
@@ -42,6 +35,12 @@ def add_categories_to_queue():
 
 
 def process_category(cat: dict, parent=0):
+    """
+
+    :param cat: dict
+    :param parent: parent category, if haven't parent category
+    :return:
+    """
     old_id = cat['id']  # original category reference (KRAMP)
     name = cat['name']
     created_category = create_category(old_id, name, parent, session=session)
@@ -50,23 +49,31 @@ def process_category(cat: dict, parent=0):
             process_category(child_category, created_category)  # created_category == parent_id
 
 
-
 def process_product(downloaded_product):
-    product = prepare_product_data(downloaded_product)
+    """
+    :param downloaded_product:
+    :return:
+    """
+    product = create_product_data(downloaded_product)
     try:
-        create_or_update(product)
-    except:
-        log_error("product failed", product)
+        new_id = create_or_update_product(product, session)
+        return new_id
+    except GenericApiException:
+        print("product failed: ", product)
 
 
-def create_or_update_product():
-    if find_product_by_id("Kcostam1"):
-        update_product_by_id(...)
+def update_product_by_id(param, session):
+    return -1
+
+
+def create_or_update_product(data, session):
+    if len(find_shoper_product(data['name'],
+                               session=session)) > 0:  # todo zobaczyć co zwraca czy pusta lista? assert equal
+        new_id = update_product_by_id(data, session=session)
+        return new_id
     else:
-        # create_product(..., session=session)
+        create_product(data, session=session)
         pass
-
-
 
 
 def start_scraping():
@@ -74,7 +81,7 @@ def start_scraping():
     product_remaining_count = get_products_count()
 
     while product_remaining_count > 0:
-        products_list = fetch_products()
+        products_list = get_graphql_products()
         add_products_to_upload_queue(products_list)
 
     while category_remaining_count > 0:
@@ -82,11 +89,18 @@ def start_scraping():
         add_categories_to_upload_queue(category_list)
 
 
-
 if __name__ == '__main__':
     # start_scraping()
     session = login_to_session()
-    products = find_product(name="kluski", session=session)
+    # products = find_product(name="kluski", session=session)
 
-    print(json.dumps(products))
-    
+    downloaded_products = get_graphql_products()
+    category = downloaded_products['category']
+    category_id = category['id']
+
+    for product in category['items']['items']:
+        product['category_id'] = category_id
+        product_id = create_product(product, session=session)
+
+    # for product in downloaded_products:
+    #     product_id = create_product(product, session=session)

@@ -39,7 +39,7 @@ def login_to_session():
     }
     response = session.post(url=shop_url + '/webapi/rest/auth', data=my_obj)
     result = response.json()
-
+    print(result)
     token = result['access_token']
     session.headers.update({'Authorization': 'Bearer %s' % token})
 
