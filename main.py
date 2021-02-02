@@ -41,7 +41,6 @@ def add_categories_to_queue():
         process_category(category['category'])
 
 
-
 def process_category(cat: dict, parent=0):
     old_id = cat['id']  # original category reference (KRAMP)
     name = cat['name']
