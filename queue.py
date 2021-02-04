@@ -36,7 +36,7 @@ def queue_item(data, record_type):
     return item
 
 
-def fail_item(record_id, reason):
+def set_queue_fail(record_id, reason):
     item = Session.query(QueueItem).filter(QueueItem.record_id == record_id).first()
     item.status = "fail"
     item.reason = reason
@@ -54,6 +54,15 @@ def get_queue_item():
     item = Session.query(QueueItem).filter(active_items).first()
     item.status = "processing"
     item.retry_count += 1
+    item.last_updated = time()
+    Session.add(item)
+    Session.commit()
+    return item
+
+
+def set_queue_success(record_id):
+    item = Session.query(QueueItem).filter(QueueItem.record_id == record_id).first()
+    item.status = "success"
     item.last_updated = time()
     Session.add(item)
     Session.commit()
