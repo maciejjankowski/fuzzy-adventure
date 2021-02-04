@@ -1,5 +1,7 @@
 from shoper_api import create_product_api, find_product_api, GenericApiException
 from shoper_dicts import create_product_data
+from shoper_category import category_exists, MissingCategoryException # category_exists jest z lokalnej bazy + fallback do API?
+
 import json
 
 urs_err = 0
@@ -7,6 +9,15 @@ MAX_RETRIES = 6
 
 
 def create_product(data, session=None):
+    """
+
+    :param data: graphql data
+    :param session: session
+    :return:
+    """
+    if not category_exists(data["category_id"]):
+        raise MissingCategoryException(message=data['category_id'])
+
     global urs_err
 
     end_product = create_product_data(data)

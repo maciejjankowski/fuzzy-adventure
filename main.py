@@ -54,12 +54,12 @@ def process_product(downloaded_product):
     :param downloaded_product:
     :return:
     """
-    product = create_product_data(downloaded_product)
+    product_data = create_product_data(downloaded_product)
     try:
-        new_id = create_or_update_product(product, session)
+        new_id = create_or_update_product(product_data, session)
         return new_id
     except GenericApiException:
-        print("product failed: ", product)
+        print("product failed: ", product_data)
 
 
 def update_product_by_id(param, session):
@@ -73,7 +73,7 @@ def create_or_update_product(data, session):
         return new_id
     else:
         create_product(data, session=session)
-        pass
+        pass  # todo czy to koniec?
 
 
 def start_scraping():
@@ -89,18 +89,30 @@ def start_scraping():
         add_categories_to_upload_queue(category_list)
 
 
+def queue_product_category_pages(category_id, total_pages, total_results):  # todo dokończyć
+    for page in total_pages:
+
+        queue_product_query()
+
+
+def process_products_response(products_response):
+    category = products_response['category']
+    category_id = category['id']
+    queue_product_category_pages(category_id,
+                                 category["items"]["pagination"]["totalPages"], category["items"]["pagination"]["totalResults"])
+    return category_id, products_response['items']['items']
+
+
 if __name__ == '__main__':
     # start_scraping()
     session = login_to_session()
     # products = find_product(name="kluski", session=session)
+    products_response = get_graphql_products()
+    category_id, downloaded_products = process_products_response(products_response)
 
-    downloaded_products = get_graphql_products()
-    category = downloaded_products['category']
-    category_id = category['id']
-
-    for product in category['items']['items']:
-        product['category_id'] = category_id
+    for product in downloaded_products:  # strasznie to brzydkie ale inaczej nie wiem jak xd
+        product['category_id'] = category_id # category_id jest tym z shopera
         product_id = create_product(product, session=session)
+        # jakie dane gdzie wstawić do tego produktu bo jest strasznie zawiły ten słownik
 
-    # for product in downloaded_products:
-    #     product_id = create_product(product, session=session)
+
