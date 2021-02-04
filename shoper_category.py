@@ -6,6 +6,25 @@ urs_err = 0
 MAX_RETRIES = 6
 
 
+class MissingCategoryException(Exception):
+
+    def __init__(self, message, status_code=-1, body="Missing category:"):
+        self.message = message
+        self.status_code = status_code
+        self.body = body
+        super().__init__(self.body + message)
+
+    def __str__(self):
+        return f'{self.status_code} -> {self.body} {self.message}'
+
+
+def category_exists(data):
+    if data["category_id"] == 1:
+        return True
+    else:
+        raise MissingCategoryException(data["category_id"])
+
+
 def create_category(old_id, name, parent_id, session=None):
     global urs_err
     retry_request = MAX_RETRIES

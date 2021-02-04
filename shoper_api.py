@@ -46,7 +46,6 @@ def login_to_session():
     return session
 
 
-
 class ApiException(Exception):
     pass
 
@@ -74,8 +73,9 @@ class AddingRecordFailedException(Exception):
     pass
 
 
-def request(data, url, session, method='POST' ):
+def request(data, url, session, method='POST'):
     """
+    :param method: POST or GET
     :param session: shoper api session
     :param data: wat we want send to endpoint
     :param url: url for endpoint is shoper api
@@ -106,8 +106,6 @@ def request(data, url, session, method='POST' ):
                 # if response_json.get("error") == 'temporarily_unavailable':
                 raise ThrottlingException
 
-
-
             if response.status_code == 200:
                 try:
                     if response.text[0] == '[' or response.text[0] == '{':
@@ -119,10 +117,10 @@ def request(data, url, session, method='POST' ):
                     else:
                         return response.text
 
-                except ValueError:  # todo:
+                except ValueError:
                     print("nope")
 
-            return response_json
+            return response_json  # todo nie ma takiej zmiennej w tej funkcji ->112
 
         except GenericApiException:
             print("Generic API Error", response.status_code, response.text)
@@ -141,53 +139,45 @@ def request(data, url, session, method='POST' ):
     new_id = response.text
     return new_id
 
-
-
-    """
-    :param session: shoper api session
-    :param data: wat we want send to endpoint
-    :param url: url for endpoint is shoper api
-    :return:  new_id - ID of the new item in the shoper database
-    """
-    retry_request = MAX_RETRIES
-    response = None
-    while retry_request >= 0:
-        try:
-            response = session.get(
-                url,
-                params=json.dumps(data)
-            )
-
-            if response.status_code == 401:
-                raise LoginException
-            if response.status_code == 400:
-                raise GenericApiException(response.status_code, response.text)
-            try:
-                response_json = json.loads(response.text)
-                if response_json["error"] == 'temporarily_unavailable':
-                    raise ThrottlingException
-
-            except ValueError:  # todo:
-                print("nope")
-
-            return response.text
-
-        except GenericApiException:
-            print("Generic API Error", response.status_code, response.text)
-            print("\nurl", url, "data:", data)
-            raise GenericApiException(response.status_code, response.text)
-
-        except LoginException:
-            login_to_session()
-            print("login expired, logging again")
-            retry_request -= 1
-
-        except ThrottlingException:
-            sleep(1 * (MAX_RETRIES - retry_request + 1))
-            retry_request -= 1
-
-    new_id = response.text
-    return new_id
+    # retry_request = MAX_RETRIES
+    # response = None
+    # while retry_request >= 0:
+    #     try:
+    #         response = session.get(
+    #             url,
+    #             params=json.dumps(data)
+    #         )
+    #
+    #         if response.status_code == 401:
+    #             raise LoginException
+    #         if response.status_code == 400:
+    #             raise GenericApiException(response.status_code, response.text)
+    #         try:
+    #             response_json = json.loads(response.text)
+    #             if response_json["error"] == 'temporarily_unavailable':
+    #                 raise ThrottlingException
+    #
+    #         except ValueError:  
+    #             print("nope")
+    #
+    #         return response.text
+    #
+    #     except GenericApiException:
+    #         print("Generic API Error", response.status_code, response.text)
+    #         print("\nurl", url, "data:", data)
+    #         raise GenericApiException(response.status_code, response.text)
+    #
+    #     except LoginException:
+    #         login_to_session()
+    #         print("login expired, logging again")
+    #         retry_request -= 1
+    #
+    #     except ThrottlingException:
+    #         sleep(1 * (MAX_RETRIES - retry_request + 1))
+    #         retry_request -= 1
+    #
+    # new_id = response.text
+    # return new_id
 
 
 def create_category_api(data, session):
@@ -207,7 +197,7 @@ def create_category_api(data, session):
         raise AddingRecordFailedException
 
 
-def create_product_api(data, session):  # todo
+def create_product_api(data, session):
     """
     :param session: shoper api session
     :param data: dict
@@ -228,7 +218,7 @@ def create_product_api(data, session):  # todo
         print("creating product failed")
 
 
-def find_product_api(data, session):  # todo
+def find_product_api(data, session):
     """
     :param session: shoper api session
     :param data: dict

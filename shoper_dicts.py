@@ -155,15 +155,8 @@ def create_product_data(data):
         'categories': [
             int
         ],
-        'special_offer': {
-            'promo_id': int,
-            'date_from': str,
-            'date_to': str,
-            'discount': float,
-            'discount_wholesale': float,
-            'discount_special': float
-        },
-        'unit_price_calculation': boolean,
+        'special_offer': {},
+        'unit_price_calculation': True,
         'children': {
             'id': int,
             'bundle_id': int,
