@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print(item)
     item2 = get_queue_item()
     print(item2)
-    item3 = fail_item(item.record_id, "whatever")
+    item3 = set_queue_fail(item.record_id, "whatever")
     print(item3)
 
     pass
