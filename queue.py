@@ -67,10 +67,12 @@ def set_queue_success(record_id):
 
 
 def get_products_count():
+    # todo
     return Session.query(QueueItem).filter(QueueItem.record_type == "product_query").count()
 
 
 def get_queued_products():
+    # todo
     item = Session.query(QueueItem).filter(QueueItem.record_type == "product_query").first()
     item.status = "processing"
     item.retry_count += 1
