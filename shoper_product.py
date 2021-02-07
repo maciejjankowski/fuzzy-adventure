@@ -4,13 +4,31 @@ from shoper_category import category_exists, MissingCategoryException # category
 
 import json
 
+from sqlalchemy import Column, String, Integer, and_, or_
+
+from alchemy.base import Base, session_factory
+from time import time
+
+
+class ProductMap(Base):
+    __tablename__ = 'product_map'
+    record_id = Column(Integer, primary_key=True)
+    kramp_id = Column('kramp_id', String(32))
+    shoper_id = Column('shoper_id', String(32))
+    last_updated = Column('last_updated', Integer)
+
+    def __init__(self, kramp_id, shoper_id):
+        self.kramp_id = kramp_id
+        self.shoper_id = shoper_id
+        self.last_updated = time()
+
+
 urs_err = 0
 MAX_RETRIES = 6
 
 
 def create_product(data, session=None):
     """
-
     :param data: graphql data
     :param session: session
     :return:
@@ -26,6 +44,7 @@ def create_product(data, session=None):
     while retry_request >= 0:
         try:
             new_id = create_product_api(end_product, session=session)
+            # add_product_map(data.get('id'), new_id)
             return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
         except GenericApiException as exception:
             print(exception)
@@ -64,3 +83,10 @@ def find_shoper_product(name, session=None):
         raise exception
 
 
+Session = session_factory()
+
+
+def add_product_map(kramp_id, shoper_id):
+    cat_map = ProductMap(kramp_id, shoper_id)
+    Session.add(cat_map)
+    Session.commit()

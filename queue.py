@@ -1,10 +1,7 @@
-from sqlalchemy import Column, String, Date, Integer, Numeric, Boolean, select, and_, or_
+from sqlalchemy import Column, String, Integer, and_, or_
 
 from alchemy.base import Base, session_factory
 from time import time
-
-
-
 
 
 class QueueItem(Base):
@@ -63,6 +60,20 @@ def get_queue_item():
 def set_queue_success(record_id):
     item = Session.query(QueueItem).filter(QueueItem.record_id == record_id).first()
     item.status = "success"
+    item.last_updated = time()
+    Session.add(item)
+    Session.commit()
+    return item
+
+
+def get_products_count():
+    return Session.query(QueueItem).filter(QueueItem.record_type == "product_query").count()
+
+
+def get_queued_products():
+    item = Session.query(QueueItem).filter(QueueItem.record_type == "product_query").first()
+    item.status = "processing"
+    item.retry_count += 1
     item.last_updated = time()
     Session.add(item)
     Session.commit()
