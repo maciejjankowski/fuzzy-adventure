@@ -6,6 +6,25 @@ urs_err = 0
 MAX_RETRIES = 6
 
 
+from sqlalchemy import Column, String, Integer, and_, or_
+
+from alchemy.base import Base, session_factory
+from time import time
+
+
+class CategoryMap(Base):
+    __tablename__ = 'category_map'
+    record_id = Column(Integer, primary_key=True)
+    kramp_id = Column('kramp_id', String(32))
+    shoper_id = Column('shoper_id', String(32))
+    last_updated = Column('last_updated', Integer)
+
+    def __init__(self, kramp_id, shoper_id):
+        self.kramp_id = kramp_id
+        self.shoper_id = shoper_id
+        self.last_updated = time()
+
+
 class MissingCategoryException(Exception):
 
     def __init__(self, message, status_code=-1, body="Missing category:"):
@@ -42,6 +61,7 @@ def create_category(old_id, name, parent_id, session=None):
                 dict_of_elem=new_old_id_dict,
                 field_names=["old_id", "new_id"]
             )
+            # add_category_map(old_id, new_id)
             return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
         except GenericApiException as exception:
@@ -50,3 +70,18 @@ def create_category(old_id, name, parent_id, session=None):
             urs_err += 1
             print("creating product:", "\n")
             retry_request -= 1
+        # except Exception as e:
+        #     print("coś innego", e)
+
+
+Session = session_factory()
+
+
+def add_category_map(kramp_id, shoper_id):
+    cat_map = CategoryMap(kramp_id, shoper_id)
+    Session.add(cat_map)
+    Session.commit()
+
+
+def get_shoper_category(kramp_id):
+    return Session.query(CategoryMap).filter(CategoryMap.kramp_id == kramp_id).first()
