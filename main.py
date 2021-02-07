@@ -65,6 +65,7 @@ def process_product(downloaded_product):
 
 
 def update_product_by_id(param, session):
+    # todo
     return -1
 
 
@@ -92,7 +93,7 @@ def start_scraping():
         add_categories_to_upload_queue(category_list)
 
 
-def queue_product_pages(category_id, total_pages, total_results):  # todo dokończyć
+def queue_product_pages(category_id, total_pages, total_results):
     for page in total_pages:
         data = {"category_id": category_id, "page": page}
         queue_item(data, "category_query")
