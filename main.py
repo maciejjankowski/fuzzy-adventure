@@ -4,7 +4,7 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import json
 
 from kramp_category import get_category_by_id
-from queue import queue_item, get_products_count, get_queued_products
+from items_queue import queue_item, get_products_count, get_queued_products
 from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException
 from shoper_dicts import create_category_data, create_product_data
 from csv_operation import append_dict_as_row
@@ -64,15 +64,16 @@ def process_product(downloaded_product):
         print("product failed: ", product_data)
 
 
-def update_product_by_id(param, session):
-    # todo
+def update_product_by_id(data, session, product_id):
+    create_product(data, session=session, product_id=product_id)
     return -1
 
 
 def create_or_update_product(data, session):
-    if len(find_shoper_product(data['name'],
-                               session=session)) > 0:  # todo zobaczyć co zwraca czy pusta lista? assert equal
-        shoper_id = update_product_by_id(data, session=session)
+    found_product = find_shoper_product(data['name'],
+                        session=session)
+    if int(found_product.get('count')) > 0:  # todo zobaczyć co zwraca czy pusta lista? assert equal
+        shoper_id = update_product_by_id(data,  session=session, product_id=found_product.get("list")[0].get("product_id"))
         return shoper_id
     else:
         shoper_id = create_product(data, session=session)
@@ -94,8 +95,8 @@ def start_scraping():
 
 
 def queue_product_pages(category_id, total_pages, total_results):
-    for page in total_pages:
-        data = {"category_id": category_id, "page": page}
+    for page in range(total_pages-1):
+        data = {"category_id": category_id, "page": page+2}
         queue_item(data, "category_query")
 
 
@@ -105,7 +106,7 @@ def process_products_response(products_response):
     queue_product_pages(kramp_category_id,
                         category["items"]["pagination"]["totalPages"],
                         category["items"]["pagination"]["totalResults"])
-    downloaded_products = products_response['items']['items']
+    downloaded_products = category['items']['items']
     for product in downloaded_products:
         product['category_id'] = get_shoper_category(kramp_category_id)
         shoper_id = create_or_update_product(product, session=session)

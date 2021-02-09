@@ -73,12 +73,13 @@ class AddingRecordFailedException(Exception):
     pass
 
 
-def request(data, url, session, method='POST'):
+def request(data, url, session, method='POST', record_id=None):
     """
     :param method: POST or GET
     :param session: shoper api session
     :param data: wat we want send to endpoint
     :param url: url for endpoint is shoper api
+    :param record_id: id used for updating record
     :return:  new_id - ID of the new item in the shoper database
     """
     retry_request = MAX_RETRIES
@@ -93,6 +94,11 @@ def request(data, url, session, method='POST'):
             elif method == "GET":
                 response = session.get(
                     url,
+                    params=data
+                )
+            elif record_id is not None:
+                response = session.put(
+                    url + "/" + record_id,
                     params=data
                 )
             else:
@@ -182,7 +188,6 @@ def request(data, url, session, method='POST'):
 
 def create_category_api(data, session):
     """
-
     :param data: dict - should have parent_id, old_shop_id, name
     :param session: shoper api session
     :return: category ID in shoper database (need if its parent/main category)
@@ -197,10 +202,11 @@ def create_category_api(data, session):
         raise AddingRecordFailedException
 
 
-def create_product_api(data, session):
+def create_product_api(data, session, record_id=None):
     """
     :param session: shoper api session
     :param data: dict
+    :param record_id
     :return: new_id: ID of the new product in the shoper database
     :raises GenericApiException:
     """
@@ -211,7 +217,7 @@ def create_product_api(data, session):
         data['parent_id'] = 0
 
     try:
-        new_id = request(data, url, session=session)
+        new_id = request(data, url, session=session, record_id=record_id)
         print("creating product:", data["name"], "\n")
         return new_id
     except GenericApiException():
