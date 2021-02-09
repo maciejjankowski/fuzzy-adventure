@@ -33,7 +33,7 @@ def create_product(data, session=None):
     :param session: session
     :return:
     """
-    if not category_exists(data["category_id"]):
+    if not category_exists(data["category_id"]):  #  TODO debug
         raise MissingCategoryException(message=data['category_id'])
 
     global urs_err
@@ -44,6 +44,33 @@ def create_product(data, session=None):
     while retry_request >= 0:
         try:
             new_id = create_product_api(end_product, session=session)
+            # add_product_map(data.get('id'), new_id)
+            return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
+        except GenericApiException as exception:
+            print(exception)
+            data['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
+            urs_err += 1
+            print("creating product:", "\n")
+            retry_request -= 1
+
+
+def update_product(data, session=None, record_id=None):
+    """
+    :param data: graphql data
+    :param session: session
+    :return:
+    """
+    if not category_exists(data["category_id"]):
+        raise MissingCategoryException(message=data['category_id'])
+
+    global urs_err
+
+    end_product = create_product_data(data)
+
+    retry_request = MAX_RETRIES
+    while retry_request >= 0:
+        try:
+            new_id = create_product_api(end_product, session=session, record_id=record_id)
             # add_product_map(data.get('id'), new_id)
             return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
         except GenericApiException as exception:

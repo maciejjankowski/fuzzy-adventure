@@ -3,6 +3,7 @@ from sqlalchemy import Column, String, Integer, and_, or_
 from alchemy.base import Base, session_factory
 from time import time
 
+Session = session_factory()
 
 class QueueItem(Base):
     """
@@ -27,6 +28,7 @@ class QueueItem(Base):
 
 
 def queue_item(data, record_type):
+    print(f"Adding {record_type} to queue", data)
     item = QueueItem(data, record_type)
     Session.add(item)
     Session.commit()

@@ -17,9 +17,13 @@ def read_csv_to_dict(file_name='category_map.csv'):
     :param file_name: file name.csv
     :return: {'old_id': 'id in shoper', }
     """
-    with open(file_name, 'r') as csv_file:
+    try:
         old_now_id_dict = {}
-        read_csv = csv.reader(csv_file, delimiter=',')
-        for row in read_csv:
-            old_now_id_dict[row[0]] = row[1]
+        with open(file_name, 'r') as csv_file:
+            read_csv = csv.reader(csv_file, delimiter=',')
+            for row in read_csv:
+                old_now_id_dict[row[0]] = row[1]
+            return old_now_id_dict
+
+    except FileNotFoundError:
         return old_now_id_dict
