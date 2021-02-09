@@ -10,7 +10,7 @@ from shoper_dicts import create_category_data, create_product_data
 from csv_operation import append_dict_as_row
 from local_settings import shop_url
 from shoper_category import create_category, add_category_map, get_shoper_category
-from shoper_product import create_product, find_shoper_product, add_product_map
+from shoper_product import create_product, find_shoper_product, add_product_map, get_product_shoper_id
 
 from kramp_products import get_graphql_products
 
@@ -68,11 +68,13 @@ def update_product_by_id(data, session, product_id):
     create_product(data, session=session, product_id=product_id)
     return -1
 
+def product_exists_in_shoper(data, session)
+    found_product = find_shoper_product(data['name'],
+                                        session=session)
+    return int(found_product.get('count')) > 0
 
 def create_or_update_product(data, session):
-    found_product = find_shoper_product(data['name'],
-                        session=session)
-    if int(found_product.get('count')) > 0:  # todo zobaczyć co zwraca czy pusta lista? assert equal
+    if get_product_shoper_id(kramp_id) or product_exists_in_shoper(data, session):
         shoper_id = update_product_by_id(data,  session=session, product_id=found_product.get("list")[0].get("product_id"))
         return shoper_id
     else:
