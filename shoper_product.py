@@ -62,7 +62,6 @@ def update_product(data, session=None, record_id=None):
     """
     if not category_exists(data["category_id"]):
         raise MissingCategoryException(message=data['category_id'])
-
     global urs_err
 
     end_product = create_product_data(data)
@@ -79,6 +78,10 @@ def update_product(data, session=None, record_id=None):
             urs_err += 1
             print("creating product:", "\n")
             retry_request -= 1
+
+
+def get_product_shoper_id(kramp_id):
+    return Session.query(ProductMap).filter(ProductMap.record_id == kramp_id).first()
 
 
 def find_shoper_product(name, session=None):
@@ -110,10 +113,10 @@ def find_shoper_product(name, session=None):
         raise exception
 
 
-Session = session_factory()
-
-
 def add_product_map(kramp_id, shoper_id):
     cat_map = ProductMap(kramp_id, shoper_id)
     Session.add(cat_map)
     Session.commit()
+
+
+Session = session_factory()
