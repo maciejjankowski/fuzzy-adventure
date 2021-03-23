@@ -44,18 +44,16 @@ def create_category_data(parent_id, old_shop_id, name):
 kramp_categories = read_csv_to_dict()
 
 
-def translate_category_id(cat_id):
-    shoper_category = kramp_categories[cat_id]
+def translate_category_id(kramp_category_id):
+    shoper_category = get_shoper_category(kramp_category_id)
     return shoper_category
-
 
 def create_product_data(data):
     """
-
     :param data: from parsed json from graphql
     :return: product data for shoper
     """
-    print(data)
+    # print(data)
     shoper_category = translate_category_id(data["category_id"])
 
     product = {
