@@ -61,7 +61,6 @@ def create_category(old_id, name, parent_id, session=None):
                 dict_of_elem=new_old_id_dict,
                 field_names=["old_id", "new_id"]
             )
-            # add_category_map(old_id, new_id)
             return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
         except GenericApiException as exception:
