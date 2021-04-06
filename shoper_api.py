@@ -38,7 +38,11 @@ def login_to_session():
         'client_secret': client_secret,
     }
     response = session.post(url=shop_url + '/webapi/rest/auth', data=my_obj)
-    result = response.json()
+    try:
+        result = response.json()
+    except:
+        print('response', response.text)
+        raise LoginException('error logging')
     print(result)
     token = result['access_token']
     session.headers.update({'Authorization': 'Bearer %s' % token})
@@ -59,7 +63,6 @@ class ThrottlingException(Exception):
 
 
 class GenericApiException(Exception):
-
     def __init__(self, status_code=-1, body="API Error"):
         self.status_code = status_code
         self.body = body
