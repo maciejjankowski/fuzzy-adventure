@@ -3,7 +3,9 @@ from gql.transport.aiohttp import AIOHTTPTransport
 
 
 transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
-                             headers={"ctx-locale": "pl_PL"})
+                             headers={"ctx-locale": "pl_PL",
+                             "ctx-locale":'pl_PL',
+                             "ctx-corporate-identity":'kramp'})
 
 client = Client(transport=transport, fetch_schema_from_transport=True)
 
