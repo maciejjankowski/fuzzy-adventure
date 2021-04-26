@@ -98,7 +98,7 @@ def create_or_update_category(category_data : dict):
     """
     try:
         if get_shoper_category(category_data['old_id']):  # todo zobaczyć co zwraca czy pusta lista? assert equal
-            shoper_id = update_category(category_data['old_id'], category_data['name'], category_data['parent_id'], session=session)
+            shoper_id = update_category(category_data['old_id'], category_data['name'], category_data['parent'], session=session)
             return shoper_id
         else:
             shoper_id, seo_url = create_category(category_data['old_id'], category_data['name'], category_data['parent'], session=session)
@@ -112,7 +112,7 @@ def product_exists_in_shoper(data, session):
     return int(found_product.get('count')) > 0
 
 
-def update_category():
+def update_category(session):
     raise('not implemented')
 
 def update_product_by_id(data, session):
