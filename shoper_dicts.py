@@ -22,6 +22,7 @@ def remove_accents(input_text):
 
 def create_category_data(parent_id, old_shop_id, name):
     no_accents_name = remove_accents(name)
+    
     category = {
         'parent_id': parent_id,  # int
         'order': 0,  # int

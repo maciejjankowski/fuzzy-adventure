@@ -55,6 +55,8 @@ def get_queue_item():
         and_(QueueItem.record_status == "fail", QueueItem.retry_count < 5)
     )
     item = Session.query(QueueItem).filter(active_items).first()
+    if item is None:
+        return None
     item.record_status = "processing"
     item.retry_count += 1
     item.last_updated = time()
