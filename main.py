@@ -36,22 +36,6 @@ def add_categories_to_queue():
         # process_category_response(category['category'])
 
 
-def process_category_response(cat: dict, parent=0):
-    """
-    :param cat: dict
-    :param parent: parent category - old_id = KRAMP ID - IMPORTANT!!!
-    :return:
-    """
-    old_id = cat['id']  # original category reference (KRAMP)
-    name = cat['name']
-    # created_category = queue_create_category(old_id, name, parent, session=session)  # TODO: queue, not create
-    data = {"old_id" : old_id, 'name' : name, 'parent': parent}
-    queue_item(data, 'create_category')
-    # add_category_map(old_id, created_category) # TODO: move inside create category
-    if cat.get('childCategories') and len(cat['childCategories']):
-        for child_category in cat['childCategories']:
-            process_category_response(child_category, old_id)  # created_category == parent_id
-
 
 def process_products_response(products_response):
     category = products_response['category']
@@ -90,12 +74,46 @@ def create_or_update_product(downloaded_product : dict):
     except GenericApiException:
         print("product failed: ", product_data)
 
+def process_category_response(cat: dict, parent=0):
+    """
+    :param cat: dict
+    :param parent: parent category - old_id = KRAMP ID - IMPORTANT!!!
+    :return:
+    """
+    old_id = cat['id']  # original category reference (KRAMP)
+    name = cat['name']
+    # created_category = queue_create_category(old_id, name, parent, session=session)  # TODO: queue, not create
+    data = {"old_id" : old_id, 'name' : name, 'parent': parent}
+    queue_item(data, 'create_category')
+    # add_category_map(old_id, created_category) # TODO: move inside create category
+    if cat.get('childCategories') and len(cat['childCategories']):
+        for child_category in cat['childCategories']:
+            process_category_response(child_category, old_id)  # created_category == parent_id
+
+
+def create_or_update_category(category_data : dict):
+    """
+    :param downloaded_product:
+    :return:
+    """
+    try:
+        if get_shoper_category(category_data['old_id']):  # todo zobaczyć co zwraca czy pusta lista? assert equal
+            shoper_id = update_category(category_data['old_id'], category_data['name'], category_data['parent_id'], session=session)
+            return shoper_id
+        else:
+            shoper_id, seo_url = create_category(category_data['old_id'], category_data['name'], category_data['parent'], session=session)
+            add_category_map(category_data['old_id'], shoper_id, seo_url=seo_url)
+        return shoper_id
+    except GenericApiException:
+        print("product failed: ", category_data)
 
 def product_exists_in_shoper(data, session):
-    found_product = find_shoper_product(data['name'],
-                                        session=session)
+    found_product = find_shoper_product(data['name'], session=session)
     return int(found_product.get('count')) > 0
 
+
+def update_category():
+    raise('not implemented')
 
 def update_product_by_id(data, session):
     raise('not implemented')
@@ -112,10 +130,10 @@ def process_queue_item(item):
 # queue -> add_category_to_shoper
     function_map = {
         'create_product' : create_or_update_product,
-        'create_category' : None,
+        'create_category' : create_or_update_category,
         'category_response' : process_category_response,
         'product_response' : process_products_response,
-        
+        'picture' : None
     }
     if (item.record_type in function_map):
         data = json.loads(item.record_data)
