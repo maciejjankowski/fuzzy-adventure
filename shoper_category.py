@@ -1,5 +1,5 @@
 from sqlalchemy.sql.functions import random
-from shoper_api import create_category_api, GenericApiException
+from shoper_api import create_category_api, GenericApiException, AddingRecordFailedException
 from shoper_dicts import create_category_data
 from csv_operation import append_dict_as_row
 
@@ -60,25 +60,20 @@ def create_category(old_id, name, parent_id, session=None):
 
     end_cat = create_category_data(parent_id=parent_id, name=name, old_shop_id=old_id)
 
-
-
-    # dodajemy losowy numer żęby nie było duplikatów
-    while get_category_seo_url(end_cat['translations']['pl_PL']['seo_url']) is not None:
-        end_cat['translations']['pl_PL']['seo_url']  += '_' + str(randint(1, 1000))
-        pass
-
-
     while retry_request >= 0:
         try:
+            while get_category_seo_url(end_cat['translations']['pl_PL']['seo_url']) is not None:
+                end_cat['translations']['pl_PL']['seo_url']  += '_' + str(randint(1, 1000))
+
+# todo sprawdzic czy generuje sie unikalny seo_url
             new_id = create_category_api(end_cat, session=session)
+            # dopisać stworzone seourl # TODO
+
             return new_id, end_cat['translations']['pl_PL']['seo_url']  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
-        except GenericApiException as exception:
+        except AddingRecordFailedException as exception:
+            print("seo_url", end_cat['translations']['pl_PL']['seo_url'])
             print(exception)
-            print("TODO: refactor") # TODO refactor
-            end_cat['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
-            urs_err += 1
-            print("creating category:", "\n")
             retry_request -= 1
         # except Exception as e:
         #     print("coś innego", e)
@@ -96,5 +91,5 @@ def add_category_map(kramp_id, shoper_id, seo_url=None):
 def get_shoper_category(kramp_id):
     return Session.query(CategoryMap).filter(CategoryMap.kramp_id == kramp_id).first()
 
-def get_category_seo_url(kramp_id):
-    return Session.query(CategoryMap).filter(CategoryMap.kramp_id == kramp_id).first()
+def get_category_seo_url(seo_url):
+    return Session.query(CategoryMap).filter(CategoryMap.seo_url == seo_url).first()
