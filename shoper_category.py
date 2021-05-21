@@ -1,5 +1,5 @@
 from sqlalchemy.sql.functions import random
-from shoper_api import create_category_api, GenericApiException
+from shoper_api import AddingRecordFailedException, create_category_api, GenericApiException
 from shoper_dicts import create_category_data
 from csv_operation import append_dict_as_row
 
@@ -73,7 +73,7 @@ def create_category(old_id, name, parent_id, session=None):
             new_id = create_category_api(end_cat, session=session)
             return new_id, end_cat['translations']['pl_PL']['seo_url']  # zwraca new_category_id, żeby podłączać podrzędne kategorie
 
-        except GenericApiException as exception:
+        except AddingRecordFailedException as exception:
             print(exception)
             print("TODO: refactor") # TODO refactor
             end_cat['translations']['pl_PL']['seo_url'] += str("_" + str(urs_err))
