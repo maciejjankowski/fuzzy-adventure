@@ -112,8 +112,9 @@ def product_exists_in_shoper(data, session):
     return int(found_product.get('count')) > 0
 
 
-def update_category(session):
-    raise('not implemented')
+def update_category(old_id, name, parent, session=None):
+    print('Try to update category:', old_id, name, parent, session)
+    return -1
 
 def update_product_by_id(data, session):
     raise('not implemented')
