@@ -4,16 +4,17 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import json
 
 from kramp_category import get_category_by_id
+from kramp_products import get_graphql_products
+
 from queue_ops import get_queue_item, queue_item, get_products_count, get_queued_product
 from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException
 from shoper_dicts import create_category_data, create_product_data
 from csv_operation import append_dict_as_row
 
-from shoper_category import create_category, add_category_map, get_shoper_category
+from shoper_category import CategoryMap, create_category, add_category_map, get_shoper_category
 from shoper_product import create_product, find_shoper_product, add_product_map
 
-from kramp_products import get_graphql_products
-
+from alchemy.base import Base, session_factory
 urs_err = 0
 
 
@@ -40,19 +41,11 @@ def add_categories_to_queue():
 def process_products_response(products_response):
     category = products_response['category']
     kramp_category_id = category['id']
-    queue_product_pages(kramp_category_id,
-                        category["items"]["pagination"]["totalPages"],
-                        category["items"]["pagination"]["totalResults"])
     downloaded_products = category['items']['items']
     for product in downloaded_products:
-        queue_item(product, "create_product", session=session) 
+        queue_item(product, "create_product")
 
 
-def queue_product_pages(category_id, total_pages, total_results):
-    for page in total_pages:
-        data = {"category_id": category_id, "page": page}
-        raise "to test"
-        queue_item(data, "category_query")
 
 
 def create_or_update_product(downloaded_product : dict):
@@ -134,6 +127,7 @@ def process_queue_item(item):
         'create_category' : create_or_update_category,
         'category_response' : process_category_response,
         'product_response' : process_products_response,
+        'product_pagination': process_product_pagination,
         'picture' : None
     }
     if (item.record_type in function_map):
@@ -143,15 +137,28 @@ def process_queue_item(item):
     else:
         print('unhandled item', item.record_type, item.record_data)
 
+def process_product_pagination(data_z_kolejki):
+    products_list = get_graphql_products(category_id=data_z_kolejki.category_id, page=data_z_kolejki.page)
+    process_products_response(products_list)
 
 
 def start_scraping():
     # add_categories_to_queue()
 
     # while get_products_count() > 0:
-    #     page, category_id = get_queued_products()
+        # page, category_id = get_queued_products()
     #     products_list = get_graphql_products(page=page, category_id=category_id)
     #     process_products_response(products_list)
+
+    # ściągamy listę kategorii
+    scraped_categories = db.query(CategoryMap).all()
+    for category in scraped_categories:
+        products_list = get_graphql_products(category_id=category.kramp_id)
+        # dodajemy strony do kolejki
+        for page in category["items"]["pagination"]["totalPages"]:
+            data = {"category_id": category.kramp_id, "page": page}
+            queue_item(data, "product_pagination")
+        process_products_response(products_list)
 
     while item := get_queue_item():
         process_queue_item(item)
@@ -162,6 +169,7 @@ print(__name__)
 
 if __name__ == '__main__':
     session = login_to_session()
+    db = session_factory()
     start_scraping()
     # products_response = get_graphql_products()
     # process_products_response(products_response)

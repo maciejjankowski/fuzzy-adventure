@@ -121,7 +121,7 @@ fragment AttributeValue on AttributeValue {
 }"""
 
 
-def get_graphql_products(q_query=query, category_id="web2-4045755", page_size=5, page=1):
+def get_graphql_products(q_query=query, category_id="", page_size=5, page=1):
     variables = {"categoryId": category_id, "pageSize": page_size, "page": page,
                  "facetValues": {"multi": [], "range": [], "single": []},
                  "componentId": "", "hasComponentId": False}
