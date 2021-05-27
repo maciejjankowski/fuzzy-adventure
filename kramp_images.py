@@ -87,8 +87,8 @@ fragment AttributeValue on AttributeValue {
 # {"operationName":"getVariantImages","variables":{"id":"ticItemGroup-47787112"}, "query"
 
 
-def get_graphql_images(q_query=query, category_id=""):
-    variables = {"id": category_id}
+def get_graphql_images(q_query=query, product_id=""):
+    variables = {"id": product_id}
 
     gql_query = gql(q_query)
 
@@ -96,4 +96,9 @@ def get_graphql_images(q_query=query, category_id=""):
         gql_query,
         variable_values=variables
     )
+
     return result
+
+
+if __name__ == '__main__':
+    print(get_graphql_images(product_id='ticItemGroup-47787112'))
