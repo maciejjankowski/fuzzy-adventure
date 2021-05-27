@@ -140,6 +140,9 @@ def process_queue_item(item):
 def process_product_pagination(data_z_kolejki):
     products_list = get_graphql_products(category_id=data_z_kolejki.category_id, page=data_z_kolejki.page)
     process_products_response(products_list)
+    queue_item(products_list, "product_response")
+
+
 
 
 def start_scraping():
