@@ -5,6 +5,7 @@ import json
 
 from kramp_category import get_category_by_id
 from kramp_products import get_graphql_products
+from kramp_images import get_graphql_images
 
 from queue_ops import get_queue_item, queue_item, get_products_count, get_queued_product
 from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException
@@ -40,12 +41,10 @@ def add_categories_to_queue():
 
 def process_products_response(products_response):
     category = products_response['category']
-    kramp_category_id = category['id']
+    # kramp_category_id = category['id']
     downloaded_products = category['items']['items']
     for product in downloaded_products:
         queue_item(product, "create_product")
-
-
 
 
 def create_or_update_product(downloaded_product : dict):
@@ -139,10 +138,21 @@ def process_queue_item(item):
 
 def process_product_pagination(data_z_kolejki):
     products_list = get_graphql_products(category_id=data_z_kolejki.category_id, page=data_z_kolejki.page)
-    process_products_response(products_list)
     queue_item(products_list, "product_response")
 
 
+def process_image(product_id):
+    images_response = get_graphql_images(product_id=product_id)
+    queue_item(images_response, 'images_response')
+
+
+def process_image_response(image_response):
+    pass
+    # Trzeba wyciągnąć wszystkie obrazki (tylko największe) dla danego produktu i napisać funkcję która 
+    # wyciągnie z nich adres url 
+
+    # for image in images:
+    #     download_image(url)
 
 
 def start_scraping():
@@ -161,7 +171,7 @@ def start_scraping():
         for page in category["items"]["pagination"]["totalPages"]:
             data = {"category_id": category.kramp_id, "page": page}
             queue_item(data, "product_pagination")
-        process_products_response(products_list)
+        queue_item(products_list, "product_response")
 
     while item := get_queue_item():
         process_queue_item(item)
