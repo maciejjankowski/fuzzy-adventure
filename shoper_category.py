@@ -1,5 +1,9 @@
 from sqlalchemy.sql.functions import random
+<<<<<<< HEAD
 from shoper_api import create_category_api, GenericApiException, AddingRecordFailedException
+=======
+from shoper_api import AddingRecordFailedException, create_category_api, GenericApiException
+>>>>>>> a79c3d504d6c117a4c6afa9be1763def6b1928ab
 from shoper_dicts import create_category_data
 from csv_operation import append_dict_as_row
 
