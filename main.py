@@ -3,12 +3,14 @@ from gql.transport.aiohttp import AIOHTTPTransport
 
 import json
 
+import requests
+
 from kramp_category import get_category_by_id
 from kramp_products import get_graphql_products
 from kramp_images import get_graphql_images
 
 from queue_ops import get_queue_item, queue_item, get_products_count, get_queued_product
-from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException
+from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException, request
 from shoper_dicts import create_category_data, create_product_data
 from csv_operation import append_dict_as_row
 
@@ -62,6 +64,7 @@ def create_or_update_product(downloaded_product : dict):
         else:
             shoper_id = create_product(product_data, session=session)
             add_product_map(product_data.get("id"), shoper_id)
+            process_image(product_data.get("id"), shoper_id)
         return shoper_id
     except GenericApiException:
         print("product failed: ", product_data)
@@ -127,7 +130,7 @@ def process_queue_item(item):
         'category_response' : process_category_response,
         'product_response' : process_products_response,
         'product_pagination': process_product_pagination,
-        'picture' : None
+        'download_image' : download_image
     }
     if (item.record_type in function_map):
         data = json.loads(item.record_data)
@@ -136,23 +139,54 @@ def process_queue_item(item):
     else:
         print('unhandled item', item.record_type, item.record_data)
 
+
+def download_file(url, file_name):
+    # https://stackoverflow.com/a/16696317/678074
+    local_filename = file_name or url.split('/')[-1]
+    # NOTE the stream=True parameter below
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        # TODO sprawwdzic czy plik juz istnieje
+        with open('images/' + local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192): 
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                #if chunk: 
+                f.write(chunk)
+    return local_filename
+
+def download_image(data):
+    image = data['image']
+    shoper_product_id = data['shoper_product_id']
+    kramp_product_id = data['kramp_product_id']
+    file_name = image.split('/')[-1]
+    download_file(image, f'{shoper_product_id}_{file_name}')
+    data['file_name'] = file_name
+    queue_item(data, 'upload_image')
+
+
 def process_product_pagination(data_z_kolejki):
     products_list = get_graphql_products(category_id=data_z_kolejki.category_id, page=data_z_kolejki.page)
     queue_item(products_list, "product_response")
 
 
-def process_image(product_id):
-    images_response = get_graphql_images(product_id=product_id)
-    queue_item(images_response, 'images_response')
+def process_image(kramp_product_id, shoper_product_id):
+    images_response = get_graphql_images(product_id=kramp_product_id)
+    images = extract_images(images_response)
+    for position, image in enumerate(images):
+        data = {'image' : image, 'shoper_product_id' : shoper_product_id, 'product_id' : kramp_product_id, 'position' : position}
+        queue_item(data, 'download_image')
 
 
-def process_image_response(image_response):
-    pass
-    # Trzeba wyciągnąć wszystkie obrazki (tylko największe) dla danego produktu i napisać funkcję która 
-    # wyciągnie z nich adres url 
-
-    # for image in images:
-    #     download_image(url)
+def extract_images(image_response):
+    """
+    wyciaga urle i skraca je zeby pominac znak wodny
+    """
+    images = []
+    for image in image_response['variant']['groupedAssets']['images']:
+      url = image['customSizes'][-1]['value'].split('?')[0]
+      images.append(url)
+    return images
 
 
 def start_scraping():
