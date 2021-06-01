@@ -1,6 +1,10 @@
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
+import os.path
+from random import randint
+
+
 import json
 
 import requests
@@ -147,6 +151,8 @@ def download_file(url, file_name):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         # TODO sprawwdzic czy plik juz istnieje
+        while os.path.exists('images/' + local_filename):
+            local_filename += '_' + str(randint(1, 1000))
         with open('images/' + local_filename, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192): 
                 # If you have chunk encoded response uncomment if
