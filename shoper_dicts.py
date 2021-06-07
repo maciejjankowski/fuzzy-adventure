@@ -49,123 +49,113 @@ def translate_category_id(kramp_category_id):
     shoper_category = get_shoper_category(kramp_category_id)
     return shoper_category
 
-def create_product_data(data):
-    """
-    :param data: from parsed json from graphql
-    :return: product data for shoper
-    """
-    # print(data)
-    shoper_category = translate_category_id(data["category_id"])
-
+def create_product_data():
+    # """
+    # :param data: from parsed json from graphql
+    # :return: product data for shoper
+    # """
+    # # print(data)
+    # shoper_category = translate_category_id(data["category_id"])
+    
     product = {
-        # 'product_id': int,
-        'type': int,
-        'producer_id': 'null | integer',
-        'group_id': int,
-        'tax_id': int,
-        'category_id': shoper_category,
-        'unit_id': 'integer',
-        'add_date': 'string',
-        'edit_date': 'string',
-        'other_price': 'float',
-        'promo_price': 'float',
-        'code': 'string',
-        'dimension_w': 'float',
-        'dimension_h': 'float',
-        'dimension_l': 'float',
-        'ean': 'string',
-        'pkwiu': 'string',
-        'is_product_of_day': 'boolean',
-        'loyalty_score': 'null | integer',
-        'loyalty_price': 'null | integer',
-        'in_loyalty': 'boolean',
-        'bestseller': 'boolean',
-        'newproduct': 'boolean',
-        'vol_weight': float,
-        'gauge_id': 'null | integer',
-        'currency_id': 'integer',
-        'additional_isbn': 'string',
-        'additional_kgo': string,
-        'additional_bloz7': integer,
-        'additional_bloz12': integer,
-        'additional_producer': string,
+        'producer_id': None,
+        'category_id': 1, #required
+        'unit_id': None,
+        'other_price': None,
+        'code': "1234", #required
+        'dimension_w': None,
+        'dimension_h': None,
+        'dimension_l': None,
+        'ean': None,
+        'pkwiu': "1234", #required
+        'is_product_of_day': False,
+        'vol_weight': None,
+        'gauge_id': None,
+        'currency_id': None,
+        'additional_isbn': None,
+        'additional_kgo': None,
+        'additional_bloz7': None,
+        'additional_bloz12': None,
+        'additional_gtu': None,
+        'additional_producer': None,
         'related': [
-            integer
+            None
         ],
         'options': [
-            integer
         ],
-        'main_image': null | {
-            'gfx_id': integer,
-            'order': integer,
-            'name': string,
-            'unic_name': string,
-            'hidden': boolean
-        },
         'stock': {
-            'stock_id': integer,
-            'product_id': integer,
-            'extended': boolean,
-            'price': float,
-            'active': boolean,
-            'default': boolean,
-            'stock': float,
-            'warn_level': null | float,
-            'sold': float,
-            'code': string,
-            'ean': string,
-            'weight': float,
-            'weight_type': integer,
-            'availability_id': integer,
-            'delivery_id': integer,
-            'gfx_id': null | integer,
-            'package': float,
-            'price_wholesale': float,
-            'price_special': float,
-            'calculation_unit_id': integer,
-            'calculation_unit_ratio': float
+            'price': 125.5,
+            'stock': None,
+            'warehouses': {
+                '(key)': 
+                    {
+                        '(key)': 'float'
+                    }
+                },
+            'stock_relative': None,
+            'warn_level': None,
+            'sold': None,
+            'sold_relative': None,
+            'weight': None,
+            'availability_id': None,
+            'delivery_id': None,
+            'gfx_id': None,
+            'package': None,
+            'price_wholesale': None,
+            'price_special': None,
+            'calculation_unit_id': None,
+            'calculation_unit_ratio': None
         },
         'translations': {
             'pl_pl': {
-                'translation_id': 0,
-                # 'product_id': integer, potrzebne czy samo nada?
-                'name': data['name'],
-                'short_description': data['description'],
-                'description': data['description'],
+                'name': 'Czarna zarowka',
+                'short_description': None,
+                'description': None,
                 'active': True,
-                'isdefault': boolean,
-                'lang_id': integer,
-                'seo_title': string,
-                'seo_description': data['description'],
-                'seo_keywords': string,
-                'seo_url': string | null,
-                'permalink': string,
-                'order': integer,
-                'main_page': boolean,
-                'main_page_order': integer
+                'seo_title': None,
+                'seo_description': None,
+                'seo_keywords': None,
+                'seo_url': None,
+                'order': None,
+                'main_page': None,
+                'main_page_order': None
             }
         },
         'attributes': {
-            '(key)':
-                {
-                    '(key)': str
-                }
+            '(key)': 'string'
         },
         'categories': [
-            int
+            'integer'
         ],
-        'special_offer': {},
-        'unit_price_calculation': True,
-        'children': {
-            'id': int,
-            'bundle_id': int,
-            'stock_id': int,
-            'product_id': int,
-            'stock': float,
-            'order': int
+        'special_offer': {
+            'promo_id': 'integer',
+            'date_from': 'string',
+            'date_to': 'string',
+            'discount': 'float',
+            'discount_wholesale': 'float',
+            'discount_special': 'float'
         },
+        'unit_price_calculation': 'boolean',
         'feeds_exludes': [
-            int
+            'integer'
         ]
     }
     return product
+
+def create_image_data(product_id, image_name, image_url):
+
+    image = {
+        'product_id': product_id,
+        'name': image_name,
+        'file': "",
+        'url': image_url,
+        'content': "",
+        'hidden': False,
+        'translations': {
+            'pl_pl': {
+                'name': image_name
+            }
+        }
+    }
+
+    return image

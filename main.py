@@ -134,7 +134,8 @@ def process_queue_item(item):
         'category_response' : process_category_response,
         'product_response' : process_products_response,
         'product_pagination': process_product_pagination,
-        'download_image' : download_image
+        'download_image' : download_image,
+        'upload_image': upload_image,
     }
     if (item.record_type in function_map):
         data = json.loads(item.record_data)
@@ -160,6 +161,7 @@ def download_file(url, file_name):
                 #if chunk: 
                 f.write(chunk)
     return local_filename
+    
 
 def download_image(data):
     image = data['image']
@@ -169,6 +171,10 @@ def download_image(data):
     download_file(image, f'{shoper_product_id}_{file_name}')
     data['file_name'] = file_name
     queue_item(data, 'upload_image')
+
+
+def upload_image(data):
+    pass
 
 
 def process_product_pagination(data_z_kolejki):
