@@ -6,7 +6,7 @@
 # 401   -   unauthorized_client 	Authentication error
 # 402	-   access_denied	        Payment required
 # 403   -	insufficient_scope	    Accessioned
-# 404	-   server_error	        An object doesn't exist
+# 404	-   server_error	        An object doesn't existsh
 # 405	-   invalid_request	        Invalid request method
 # 409   -   server_error	        Conflict - another administrator has locked an access to the object
 # 429	-   temporarily_unavailable	Calls limit exceeded
@@ -71,7 +71,8 @@ class GenericApiException(Exception):
         super().__init__(self.body)
 
     def __str__(self):
-        return f'{self.status_code} -> {self.body}'
+        # return f'{self.status_code} -> {self.body}'
+        return '{} -> {}'.format(self.status_code, self.body)
 
 
 class AddingRecordFailedException(Exception):
@@ -122,7 +123,7 @@ def request(data, url, session, method='POST', record_id=None):
                     if response.text[0] == '[' or response.text[0] == '{':
                         response_json = json.loads(response.text)
                         if response_json.get("error") == 'temporarily_unavailable':
-                            print("to nie powinno działać")
+                            print("to nie powinno dzialac")
                             raise ThrottlingException
                         return response_json
                     else:
@@ -131,7 +132,8 @@ def request(data, url, session, method='POST', record_id=None):
                 except ValueError:
                     print("nope")
 
-            return response_json  # todo nie ma takiej zmiennej w tej funkcji ->112
+            # return response_json  # todo nie ma takiej zmiennej w tej funkcji ->112
+            return response
 
         except GenericApiException:
             print("Generic API Error", response.status_code, response.text)
@@ -250,10 +252,12 @@ def find_product_api(data, session):
 
 if __name__ == '__main__':
     session = login_to_session()
-    image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
-    data = create_image_data(30, 'name', image_url)
-    print(data)
-    # url = 'https://shop.url/webapi/rest/product-images'
-    # request(data, url, session)
+    # image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+    # data = create_image_data(30, 'name', image_url)
     # print(data)
-    # print('hello')
+    url = 'https://sklep713430.shoparena.pl/webapi/rest/product-images/1'
+    # url = 'https://www.google.pl'
+    response = request(None, url, session, method='GET')
+    print(response)
+    # print(data)
+    
