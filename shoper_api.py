@@ -18,6 +18,8 @@ import requests
 from time import sleep
 import json
 
+from shoper_dicts import create_image_data
+
 try:
     from local_settings import *
 except ImportError:
@@ -246,5 +248,12 @@ def find_product_api(data, session):
 
 
 
-
-
+if __name__ == '__main__':
+    session = login_to_session()
+    image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+    data = create_image_data(30, 'name', image_url)
+    print(data)
+    # url = 'https://shop.url/webapi/rest/product-images'
+    # request(data, url, session)
+    # print(data)
+    # print('hello')
