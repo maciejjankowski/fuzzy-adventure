@@ -132,8 +132,7 @@ def request(data, url, session, method='POST', record_id=None):
                 except ValueError:
                     print("nope")
 
-            # return response_json  # todo nie ma takiej zmiennej w tej funkcji ->112
-            return response
+            return response.text  # todo nie ma takiej zmiennej w tej funkcji ->112
 
         except GenericApiException:
             print("Generic API Error", response.status_code, response.text)
@@ -252,12 +251,12 @@ def find_product_api(data, session):
 
 if __name__ == '__main__':
     session = login_to_session()
-    # image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
-    # data = create_image_data(30, 'name', image_url)
-    # print(data)
-    url = 'https://sklep713430.shoparena.pl/webapi/rest/product-images/1'
+    image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
+    data = create_image_data(29, 'name', image_url)
+    # url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
+    url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
     # url = 'https://www.google.pl'
-    response = request(None, url, session, method='GET')
+    response = request(data, url, session, method='POST')
     print(response)
     # print(data)
     
