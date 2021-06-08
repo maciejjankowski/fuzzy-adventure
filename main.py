@@ -15,11 +15,11 @@ from kramp_images import get_graphql_images
 
 from queue_ops import get_queue_item, queue_item, get_products_count, get_queued_product
 from shoper_api import login_to_session, create_product_api, create_category_api, GenericApiException, request
-from shoper_dicts import create_category_data, create_product_data
+from shoper_dicts import create_category_data, create_image_data, create_product_data
 from csv_operation import append_dict_as_row
 
 from shoper_category import CategoryMap, create_category, add_category_map, get_shoper_category
-from shoper_product import create_product, find_shoper_product, add_product_map
+from shoper_product import create_product, find_shoper_product, add_product_map, upload_image
 
 from alchemy.base import Base, session_factory
 urs_err = 0
@@ -113,6 +113,7 @@ def product_exists_in_shoper(data, session):
 
 def update_category(old_id, name, parent, session=None):
     print('Try to update category:', old_id, name, parent, session)
+    raise('not implemented')
     return -1
 
 def update_product_by_id(data, session):
@@ -134,8 +135,8 @@ def process_queue_item(item):
         'category_response' : process_category_response,
         'product_response' : process_products_response,
         'product_pagination': process_product_pagination,
-        'download_image' : download_image,
-        'upload_image': upload_image,
+        # 'download_image' : download_image,
+        'process_image_data': process_image_data,
     }
     if (item.record_type in function_map):
         data = json.loads(item.record_data)
@@ -145,36 +146,9 @@ def process_queue_item(item):
         print('unhandled item', item.record_type, item.record_data)
 
 
-def download_file(url, file_name):
-    # https://stackoverflow.com/a/16696317/678074
-    local_filename = file_name or url.split('/')[-1]
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        # TODO sprawwdzic czy plik juz istnieje
-        while os.path.exists('images/' + local_filename):
-            local_filename += '_' + str(randint(1, 1000))
-        with open('images/' + local_filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192): 
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                #if chunk: 
-                f.write(chunk)
-    return local_filename
-    
-
-def download_image(data):
-    image = data['image']
-    shoper_product_id = data['shoper_product_id']
-    kramp_product_id = data['kramp_product_id']
-    file_name = image.split('/')[-1]
-    download_file(image, f'{shoper_product_id}_{file_name}')
-    data['file_name'] = file_name
-    queue_item(data, 'upload_image')
-
-
-def upload_image(data):
-    pass
+def process_image_data(data):
+    result = upload_image(data)
+    return result
 
 
 def process_product_pagination(data_z_kolejki):
@@ -187,7 +161,7 @@ def process_image(kramp_product_id, shoper_product_id):
     images = extract_images(images_response)
     for position, image in enumerate(images):
         data = {'image' : image, 'shoper_product_id' : shoper_product_id, 'product_id' : kramp_product_id, 'position' : position}
-        queue_item(data, 'download_image')
+        queue_item(data, 'process_image_data')
 
 
 def extract_images(image_response):
@@ -204,12 +178,6 @@ def extract_images(image_response):
 def start_scraping():
     # add_categories_to_queue()
 
-    # while get_products_count() > 0:
-        # page, category_id = get_queued_products()
-    #     products_list = get_graphql_products(page=page, category_id=category_id)
-    #     process_products_response(products_list)
-
-    # ściągamy listę kategorii
     scraped_categories = db.query(CategoryMap).all()
     for category in scraped_categories:
         products_list = get_graphql_products(category_id=category.kramp_id)

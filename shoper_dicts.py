@@ -63,9 +63,9 @@ def create_product_data(category_id, price, unique_product_code, calculation_uni
         'unit_id': None,
         'other_price': None,
         'code': unique_product_code, #required and unique
-        'dimension_w': None,
-        'dimension_h': None,
-        'dimension_l': None,
+        # 'dimension_w': None,
+        # 'dimension_h': None,
+        # 'dimension_l': None,
         'ean': None,
         'pkwiu': None, 
         'is_product_of_day': False,
@@ -80,20 +80,20 @@ def create_product_data(category_id, price, unique_product_code, calculation_uni
         'additional_producer': None,
         'stock': {
             'price': price,
-            'stock': None,
-            'stock_relative': None,
-            'warn_level': None,
-            'sold': None,
-            'sold_relative': None,
-            'weight': None,
-            'availability_id': None,
-            'delivery_id': None,
-            'gfx_id': None,
-            'package': None,
-            'price_wholesale': None,
-            'price_special': None,
-            'calculation_unit_id': calculation_unit_id, #required
-            'calculation_unit_ratio': calculation_unit_ratio, #required
+            # 'stock': None,
+            # 'stock_relative': None,
+            # 'warn_level': None,
+            # 'sold': None,
+            # 'sold_relative': None,
+            # 'weight': None,
+            # 'availability_id': None,
+            # 'delivery_id': None,
+            # 'gfx_id': None,
+            # 'package': None,
+            # 'price_wholesale': None,
+            # 'price_special': None,
+            # 'calculation_unit_id': calculation_unit_id, #required
+            # 'calculation_unit_ratio': calculation_unit_ratio, #required
         },
         'translations': {
             'pl_pl': {
