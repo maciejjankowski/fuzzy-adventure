@@ -49,7 +49,7 @@ def translate_category_id(kramp_category_id):
     shoper_category = get_shoper_category(kramp_category_id)
     return shoper_category
 
-def create_product_data():
+def create_product_data(category_id, price, unique_product_code, calculation_unit_id = 1, calculation_unit_ratio = 1):
     # """
     # :param data: from parsed json from graphql
     # :return: product data for shoper
@@ -59,15 +59,15 @@ def create_product_data():
     
     product = {
         'producer_id': None,
-        'category_id': 1, #required
+        'category_id': category_id, #required
         'unit_id': None,
         'other_price': None,
-        'code': "1234", #required
+        'code': unique_product_code, #required and unique
         'dimension_w': None,
         'dimension_h': None,
         'dimension_l': None,
         'ean': None,
-        'pkwiu': "1234", #required
+        'pkwiu': None, 
         'is_product_of_day': False,
         'vol_weight': None,
         'gauge_id': None,
@@ -78,20 +78,9 @@ def create_product_data():
         'additional_bloz12': None,
         'additional_gtu': None,
         'additional_producer': None,
-        'related': [
-            None
-        ],
-        'options': [
-        ],
         'stock': {
-            'price': 125.5,
+            'price': price,
             'stock': None,
-            'warehouses': {
-                '(key)': 
-                    {
-                        '(key)': 'float'
-                    }
-                },
             'stock_relative': None,
             'warn_level': None,
             'sold': None,
@@ -103,12 +92,12 @@ def create_product_data():
             'package': None,
             'price_wholesale': None,
             'price_special': None,
-            'calculation_unit_id': None,
-            'calculation_unit_ratio': None
+            'calculation_unit_id': calculation_unit_id, #required
+            'calculation_unit_ratio': calculation_unit_ratio, #required
         },
         'translations': {
             'pl_pl': {
-                'name': 'Czarna zarowka',
+                'name': 'Test zarowka',
                 'short_description': None,
                 'description': None,
                 'active': True,
@@ -121,24 +110,6 @@ def create_product_data():
                 'main_page_order': None
             }
         },
-        'attributes': {
-            '(key)': 'string'
-        },
-        'categories': [
-            'integer'
-        ],
-        'special_offer': {
-            'promo_id': 'integer',
-            'date_from': 'string',
-            'date_to': 'string',
-            'discount': 'float',
-            'discount_wholesale': 'float',
-            'discount_special': 'float'
-        },
-        'unit_price_calculation': 'boolean',
-        'feeds_exludes': [
-            'integer'
-        ]
     }
     return product
 

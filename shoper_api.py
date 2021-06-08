@@ -19,6 +19,7 @@ from time import sleep
 import json
 
 from shoper_dicts import create_image_data
+from shoper_dicts import create_product_data
 
 try:
     from local_settings import *
@@ -252,10 +253,15 @@ def find_product_api(data, session):
 if __name__ == '__main__':
     session = login_to_session()
     image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
-    data = create_image_data(29, 'name', image_url)
+    # data = create_image_data(29, 'name', image_url)
+    
+    # # url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
     # url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
-    url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
-    # url = 'https://www.google.pl'
+    # # url = 'https://www.google.pl'
+    # response = request(data, url, session, method='POST')
+
+    data = create_product_data()
+    url = 'https://sklep378376.shoparena.pl/webapi/rest/products'
     response = request(data, url, session, method='POST')
     print(response)
     # print(data)
