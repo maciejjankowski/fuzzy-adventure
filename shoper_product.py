@@ -1,5 +1,5 @@
-from shoper_api import create_product_api, find_product_api, GenericApiException
-from shoper_dicts import create_product_data
+from shoper_api import create_image_api, create_product_api, find_product_api, GenericApiException
+from shoper_dicts import create_image_data, create_product_data
 from shoper_category import category_exists, MissingCategoryException # category_exists jest z lokalnej bazy + fallback do API?
 
 import json
@@ -53,6 +53,21 @@ def create_product(data, session=None):
             print("creating product:", "\n")
             retry_request -= 1
 
+
+
+def upload_image(data, session=None,):
+    image_data = create_image_data(data['shoper_produt_id'], data['position'], data['image'])
+    retry_request = MAX_RETRIES
+    while retry_request >= 0:
+        try:
+            new_id = create_image_api(image_data, session=session)
+            # add_product_map(data.get('id'), new_id)
+            return new_id  # zwraca new_category_id, żeby podłączać podrzędne kategorie
+        except GenericApiException as exception:
+            print("creating image:")
+            print(exception)
+            retry_request -= 1
+    pass
 
 def update_product(data, session=None, record_id=None):
     """

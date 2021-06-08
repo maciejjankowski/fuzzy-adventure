@@ -209,6 +209,14 @@ def create_category_api(data, session):
         raise AddingRecordFailedException
 
 
+def create_image_api(data, session):
+    url = shop_url + '/webapi/rest/product-images'
+    try:
+        new_id = request(data, url, session=session)
+        return new_id
+    except GenericApiException():
+        print("creating product image failed")
+
 def create_product_api(data, session, record_id=None):
     """
     :param session: shoper api session
@@ -252,17 +260,18 @@ def find_product_api(data, session):
 
 if __name__ == '__main__':
     session = login_to_session()
-    image_url = 'https://cdn.eso.org/images/screen/eso1907a.jpg'
-    # data = create_image_data(29, 'name', image_url)
+    image_url = 'https://images.pexels.com/photos/1086723/pexels-photo-1086723.jpeg?auto=compress&cs=tinysrgb&h=75&w=12'
+    data = create_image_data(29, 'name', image_url)
     
     # # url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
-    # url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
+    url = 'https://sklep378376.shoparena.pl/webapi/rest/product-images/29'
     # # url = 'https://www.google.pl'
-    # response = request(data, url, session, method='POST')
-
-    data = create_product_data()
-    url = 'https://sklep378376.shoparena.pl/webapi/rest/products'
     response = request(data, url, session, method='POST')
     print(response)
+    exit()
+    data = create_product_data(1, 1, 1222)
+    url = 'https://sklep378376.shoparena.pl/webapi/rest/products'
+    response = request(data, url, session, method='POST')
+    
     # print(data)
     
