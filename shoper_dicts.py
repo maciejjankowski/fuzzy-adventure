@@ -49,7 +49,8 @@ def translate_category_id(kramp_category_id):
     shoper_category = get_shoper_category(kramp_category_id)
     return shoper_category
 
-def create_product_data(category_id, price, unique_product_code, calculation_unit_id = 1, calculation_unit_ratio = 1):
+def create_product_data(category_id=-1, price=0, unique_product_code='',
+    name='', description=''):
     # """
     # :param data: from parsed json from graphql
     # :return: product data for shoper
@@ -97,9 +98,9 @@ def create_product_data(category_id, price, unique_product_code, calculation_uni
         },
         'translations': {
             'pl_pl': {
-                'name': 'Test zarowka',
-                'short_description': None,
-                'description': None,
+                'name': name,
+                'short_description': description,
+                'description': description,
                 'active': True,
                 'seo_title': None,
                 'seo_description': None,
