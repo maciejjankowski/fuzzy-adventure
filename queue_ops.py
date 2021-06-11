@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, and_, or_
-
+from sqlalchemy.exc import IntegrityError
 from alchemy.base import Base, session_factory
 from time import time
 import json
@@ -33,10 +33,14 @@ def queue_item(data, record_type):
     """
     record_type : ['category_query', 'product_query', 'product_data', 'category_data']
     """
-    item = QueueItem(data, record_type)
-    Session.add(item)
-    Session.commit()
-    return item
+    try:
+        item = QueueItem(data, record_type)
+        Session.add(item)
+        Session.commit()
+        return item
+    except IntegrityError as e:
+        Session.rollback()
+        print("duplikat")
 
 
 def set_queue_fail(record_id, reason):
