@@ -3,7 +3,10 @@
 # GET categories
 
 from gql import gql, Client
+<<<<<<< HEAD
 from time import sleep
+=======
+>>>>>>> fee698492b6d3757c43b5c568d876b0ae055eaf3
 from gql.transport.aiohttp import AIOHTTPTransport
 
 transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
@@ -13,6 +16,10 @@ transport = AIOHTTPTransport(url="https://www.kramp.com/graphql/checkout-app",
 
 client = Client(transport=transport, fetch_schema_from_transport=True)
 query = """
+<<<<<<< HEAD
+=======
+
+>>>>>>> fee698492b6d3757c43b5c568d876b0ae055eaf3
 query GetCategoryProducts($categoryId: ID!, $pageSize: Int!, $page: Int!, $facetValues: FacetValuesInput) {
   category(id: $categoryId) {
     id
@@ -121,13 +128,21 @@ fragment AttributeValue on AttributeValue {
 }"""
 
 
+<<<<<<< HEAD
 def get_graphql_products(q_query=query, category_id="", page_size=350, page=1):
+=======
+def get_graphql_products(q_query=query, category_id="", page_size=5, page=1):
+>>>>>>> fee698492b6d3757c43b5c568d876b0ae055eaf3
     variables = {"categoryId": category_id, "pageSize": page_size, "page": page,
                  "facetValues": {"multi": [], "range": [], "single": []},
                  "componentId": "", "hasComponentId": False}
 
     gql_query = gql(q_query)
+<<<<<<< HEAD
     sleep(1.5)
+=======
+
+>>>>>>> fee698492b6d3757c43b5c568d876b0ae055eaf3
     result = client.execute(
         gql_query,
         variable_values=variables
